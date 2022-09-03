@@ -14,3 +14,31 @@
 -> Se precisar apagar no github
 >> git push origin --delete refatoracao_conexao
 >> aponto a origem para o repositorio correto
+
+1) Forma geral de trabalho
+-> Verificar a branch que estou
+-> devo trabalhar na branch da release
+>> git branch
+-> se não estou na branch correta, vou para a branch correta
+>> git checkout release_setup
+
+--> trabalho nos arquivos
+--> vejo as diferencas
+>> git status
+--> adiciono os arquivos necessários
+>> git add .
+--> faço um commit
+>> git commit -a -m "CYRILLO_FEAT_0001 - Setup do repositorio"
+--> mandar para o repositorio remoto
+>> git push origin release_setup
+
+
+2)  main is now named master
+If you have a local clone, you can update it by running the following commands.
+
+>> git branch -m main master
+>> git fetch origin
+>> git branch -u origin/master master
+>> git remote set-head origin -a
+
+
