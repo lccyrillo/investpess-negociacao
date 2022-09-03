@@ -13,7 +13,8 @@
 >> git branch -D main
 -> Se precisar apagar no github
 >> git push origin --delete refatoracao_conexao
->> aponto a origem para o repositorio correto
+-> aponto a origem para o repositorio correto
+>> git push --set-upstream origin release_setup
 
 1) Forma geral de trabalho
 -> Verificar a branch que estou
