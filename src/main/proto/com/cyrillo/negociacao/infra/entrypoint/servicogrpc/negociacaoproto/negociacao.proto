@@ -42,7 +42,6 @@ message RegistraNegociacaoResponse {
   int32 response_code = 1;
   string response_message = 2;
   int32 chave_identificadora_negociacao = 3;
-  int32 chave_identificadora_negociacao = 4;
 }
 
 service NegociacaoService {

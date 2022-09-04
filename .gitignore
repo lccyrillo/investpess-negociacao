@@ -24,5 +24,6 @@ hs_err_pid*
 
 .gradle
 .gradle/*
+.gradle/7.4/*
 build
 build/*
