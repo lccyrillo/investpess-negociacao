@@ -33,9 +33,10 @@ message ValoresFinanceirosNegocio {
 }
 
 message RegistraNegociacaoRequest {
-  IdentificacaoNegocio identificacao_negocio = 1;
-  ValoresFinanceirosNegocio valores_financeiros = 2;
-  repeated AtivoNegociado ativos_negociados = 3;
+  string flow_id = 1;
+  IdentificacaoNegocio identificacao_negocio = 2;
+  ValoresFinanceirosNegocio valores_financeiros = 3;
+  repeated AtivoNegociado ativos_negociados = 4;
 }
 
 message RegistraNegociacaoResponse {
