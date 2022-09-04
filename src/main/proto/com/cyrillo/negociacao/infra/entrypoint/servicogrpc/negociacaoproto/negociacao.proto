@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package negociacaoproto;
+option java_package = "com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto";
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+
+message AtivoNegociado {
+  string sigla_ativo = 1;
+  int32 tipo_negocio = 2;  // 1 - compra , 2 venda
+  double quantidade_negociada = 3;
+  double preco_negociado = 4;
+}
+
+message IdentificacaoNegocio {
+  string identificador_negocio = 1;
+  string corretora_negocio = 2;
+  string identificacao_cliente_negocio = 3;
+  google.protobuf.Timestamp data_negocio = 4;
+  google.protobuf.Timestamp data_liquidacao = 5;
+}
+
+message ValoresFinanceirosNegocio {
+  double valor_vendas_a_vista = 1;
+  double valor_compras_a_vista = 2;
+  double valor_taxa_liquidacao = 3;
+  double valor_emolumentos = 4;
+  double valor_corretagem = 5;
+  double valor_iss = 6;
+  double valor_irrf = 7;
+  double valor_liquido_conta = 8;
+}
+
+message RegistraNegociacaoRequest {
+  IdentificacaoNegocio identificacao_negocio = 1;
+  ValoresFinanceirosNegocio valores_financeiros = 2;
+  repeated AtivoNegociado ativos_negociados = 3;
+}
+
+message RegistraNegociacaoResponse {
+  int32 response_code = 1;
+  string response_message = 2;
+  int32 chave_identificadora_negociacao = 3;
+}
+
+service NegociacaoServerService {
+  //unary
+  rpc RegistraNegociacao(RegistraNegociacaoRequest) returns (RegistraNegociacaoResponse) {};
+}
