@@ -44,7 +44,7 @@ message RegistraNegociacaoResponse {
   int32 chave_identificadora_negociacao = 3;
 }
 
-service NegociacaoServerService {
+service NegociacaoService {
   //unary
   rpc RegistraNegociacao(RegistraNegociacaoRequest) returns (RegistraNegociacaoResponse) {};
 }
