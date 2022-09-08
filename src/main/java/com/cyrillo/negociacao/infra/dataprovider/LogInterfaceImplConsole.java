@@ -1,7 +1,7 @@
 package com.cyrillo.negociacao.infra.dataprovider;
 
-import com.cyrillo.negociacao.core.dataprovider.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoLogDataProvExcecao;
 
 

@@ -1,4 +1,4 @@
-package com.cyrillo.negociacao.core.dataprovider;
+package com.cyrillo.negociacao.core.dataprovider.tipos;
 import com.cyrillo.negociacao.core.dataprovider.excecao.FalhaObterConexaoRepoDataProvExcecao;
 
 import java.sql.Connection;

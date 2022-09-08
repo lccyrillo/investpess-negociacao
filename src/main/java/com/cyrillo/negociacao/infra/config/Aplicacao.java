@@ -1,14 +1,20 @@
 package com.cyrillo.negociacao.infra.config;
 
-import com.cyrillo.negociacao.core.dataprovider.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
 import com.cyrillo.negociacao.infra.config.excecao.PropriedadeInvalidaConfigExcecao;
+import com.cyrillo.negociacao.infra.dataprovider.AtivoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.LogInterfaceImplConsole;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.NegociacaoServerGRPC;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -20,6 +26,10 @@ public class Aplicacao implements DataProviderInterface {
     private String logImplementacao;
     private List<String> propriedadeLog; // lista de todos os domínios possíveis para a propriedade de log.
     private List<String> propriedadeRepo;// lista de todos os domínios possíveis para a propriedade de log.
+    private String repoImplementacao;
+    private AtivoRepositorioInterface ativoRepositorio;
+    private UUID sessionId;
+    private String flowId;
 
     private Aplicacao(){
     }
@@ -37,8 +47,10 @@ public class Aplicacao implements DataProviderInterface {
 
     public void inicializaAplicacao(){
         try {
+            this.sessionId = UUID.randomUUID();
             carregarConfiguracoes();
             configurarLogAplicacao();
+            configurarRepositorioAplicacao();
             this.logAplicacao.logInfo(null,null, "Inicializando aplicação...");
             this.logAplicacao.logInfo(null,null, "Propriedades de configuração da aplicação carregadas!");
             this.logAplicacao.logInfo(null,null, getConfiguracoesAplicacao());
@@ -105,8 +117,23 @@ public class Aplicacao implements DataProviderInterface {
         return descricaoConfiguracaoAplicacao;
     }
 
-    public UUID getUniqueKey(){
-        return null;
+    public AtivoRepositorioInterface getAtivoRepositorio() {
+        return ativoRepositorio;
+    }
+
+    public void setAtivoRepositorio(AtivoRepositorioInterface ativoRepositorio) {
+        this.ativoRepositorio = ativoRepositorio;
+    }
+
+    public String getSessionId() {
+        return String.valueOf(sessionId);
+    }
+    public void setFlowId(String flowId) {
+        this.flowId = flowId;
+    }
+
+    public String getFlowId() {
+        return flowId;
     }
 
     @Override
@@ -127,11 +154,36 @@ public class Aplicacao implements DataProviderInterface {
         return new LogInterfaceImplConsole();
     }
 
+    private void configurarRepositorioAplicacao() {
+      //  if (this.repoImplementacao.equals("postgres")){
+            //this.ativoRepositorio = new AtivoRepositorioImplcomJDBC();
+       // }
+       // else {
+            this.ativoRepositorio = new AtivoRepositorioImplMemoria();
+       // }
+    }
+
+
+
     public DataProviderInterface geraSessao(){
         return new Sessao();
     }
 
     public LogInterface getLoggingInterface() {
         return this.logAplicacao;
+    }
+
+    public String converterGoogleProtobufTimeStampParaStringData(long seconds,int nanos){
+        Instant instant =  Instant.ofEpochSecond(seconds,nanos);
+        String PATTERN_FORMAT = "dd/MM/yyyy";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT).withZone(ZoneId.systemDefault());
+        return formatter.format(instant);
+    }
+
+    public LocalDateTime converterGoogleProtobufTimeStampParaLocalDateTime(long seconds,int nanos){
+        Instant instant =  Instant.ofEpochSecond(seconds,nanos);
+        //LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("America/Sao_Paulo"));
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return localDateTime;
     }
 }
