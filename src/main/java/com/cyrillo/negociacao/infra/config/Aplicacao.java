@@ -3,18 +3,16 @@ package com.cyrillo.negociacao.infra.config;
 import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.UtilitarioInterface;
 import com.cyrillo.negociacao.infra.config.excecao.PropriedadeInvalidaConfigExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.AtivoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.LogInterfaceImplConsole;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.NegociacaoServerGRPC;
+import com.cyrillo.negociacao.infra.util.Utilitario;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -30,6 +28,9 @@ public class Aplicacao implements DataProviderInterface {
     private AtivoRepositorioInterface ativoRepositorio;
     private UUID sessionId;
     private String flowId;
+    private Utilitario utilitario;
+
+
 
     private Aplicacao(){
     }
@@ -54,6 +55,7 @@ public class Aplicacao implements DataProviderInterface {
             this.logAplicacao.logInfo(null,null, "Inicializando aplicação...");
             this.logAplicacao.logInfo(null,null, "Propriedades de configuração da aplicação carregadas!");
             this.logAplicacao.logInfo(null,null, getConfiguracoesAplicacao());
+            utilitario = new Utilitario();
             NegociacaoServerGRPC var = new NegociacaoServerGRPC(this);
 
 
@@ -173,17 +175,10 @@ public class Aplicacao implements DataProviderInterface {
         return this.logAplicacao;
     }
 
-    public String converterGoogleProtobufTimeStampParaStringData(long seconds,int nanos){
-        Instant instant =  Instant.ofEpochSecond(seconds,nanos);
-        String PATTERN_FORMAT = "dd/MM/yyyy";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN_FORMAT).withZone(ZoneId.systemDefault());
-        return formatter.format(instant);
+    public UtilitarioInterface getUtilitario(){
+        return utilitario;
     }
 
-    public LocalDateTime converterGoogleProtobufTimeStampParaLocalDateTime(long seconds,int nanos){
-        Instant instant =  Instant.ofEpochSecond(seconds,nanos);
-        //LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("America/Sao_Paulo"));
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        return localDateTime;
-    }
+
+
 }

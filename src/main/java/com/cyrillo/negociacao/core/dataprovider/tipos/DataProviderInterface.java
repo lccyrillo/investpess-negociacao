@@ -11,6 +11,5 @@ public interface DataProviderInterface {
     public String getSessionId();
     public void setFlowId(String flowId);
     public String getFlowId();
-    public String converterGoogleProtobufTimeStampParaStringData(long seconds,int nanos);
-    public LocalDateTime converterGoogleProtobufTimeStampParaLocalDateTime(long seconds, int nanos);
+    public UtilitarioInterface getUtilitario();
 }

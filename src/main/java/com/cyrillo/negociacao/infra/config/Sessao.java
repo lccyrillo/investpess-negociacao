@@ -3,6 +3,8 @@ package com.cyrillo.negociacao.infra.config;
 import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.UtilitarioInterface;
+import com.google.gson.Gson;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -54,12 +56,8 @@ public class Sessao implements DataProviderInterface {
         Aplicacao.getInstance().setAtivoRepositorio(ativoRepositorio);
     }
 
-    public String converterGoogleProtobufTimeStampParaStringData(long seconds,int nanos){
-        return Aplicacao.getInstance().converterGoogleProtobufTimeStampParaStringData(seconds, nanos);
-    }
-
-    public LocalDateTime converterGoogleProtobufTimeStampParaLocalDateTime(long seconds, int nanos){
-        return Aplicacao.getInstance().converterGoogleProtobufTimeStampParaLocalDateTime(seconds, nanos);
+    public UtilitarioInterface getUtilitario(){
+        return Aplicacao.getInstance().getUtilitario();
     }
 
 }

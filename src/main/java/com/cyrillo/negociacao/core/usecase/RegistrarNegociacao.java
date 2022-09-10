@@ -4,19 +4,20 @@ package com.cyrillo.negociacao.core.usecase;
 import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.NegociacaoDtoInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 
 public class RegistrarNegociacao {
 
     public RegistrarNegociacao(){}
 
-    public void executar(DataProviderInterface data, String flowId) throws ComunicacaoRepoUseCaseExcecao  {
+    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao  {
         // Mapa de resultados do use case
         LogInterface log = data.getLoggingInterface();
         data.setFlowId(flowId);
-        String uniqueKey =String.valueOf(data.getSessionId());
+        String sessionId =String.valueOf(data.getSessionId());
 
-        log.logInfo(flowId, uniqueKey,"Iniciando Use Case Incluir Novo Ativo");
+        log.logInfo(flowId, sessionId,"Iniciando Use Case Incluir Novo Ativo");
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
 
 

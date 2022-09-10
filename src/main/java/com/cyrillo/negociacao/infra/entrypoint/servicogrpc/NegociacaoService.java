@@ -1,17 +1,17 @@
 package com.cyrillo.negociacao.infra.entrypoint.servicogrpc;
 
-import com.cyrillo.negociacao.core.dataprovider.dto.IdentificacaoNegocioDto;
+import com.cyrillo.negociacao.infra.dataprovider.dto.IdentificacaoNegocioDto;
 import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.IdentificacaoNegocioDtoInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ParametrosInvalidosUseCaseExcecao;
+import com.cyrillo.negociacao.infra.dataprovider.dto.NegociacaoDto;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.IdentificacaoNegocio;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.NegociacaoServiceGrpc;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.RegistraNegociacaoRequest;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.RegistraNegociacaoResponse;
 import com.cyrillo.negociacao.infra.facade.FacadeNegociacao;
-import com.google.protobuf.Timestamp;
 import io.grpc.stub.StreamObserver;
 
 import java.time.LocalDateTime;
@@ -36,18 +36,24 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
 
             // Captura dados da requisição
             String flowId = request.getFlowId();
+
             IdentificacaoNegocio identificacaoNegocio = request.getIdentificacaoNegocio();
             String identificadorNegocio = identificacaoNegocio.getIdentificadorNegocio();
             String corretora = identificacaoNegocio.getCorretoraNegocio();
             String identificacaoClienteNegocio = identificacaoNegocio.getIdentificacaoClienteNegocio();
-            LocalDateTime dataNegocio = data.converterGoogleProtobufTimeStampParaLocalDateTime(identificacaoNegocio.getDataNegocio().getSeconds(),identificacaoNegocio.getDataNegocio().getNanos());
-            LocalDateTime dataLiquidacao = data.converterGoogleProtobufTimeStampParaLocalDateTime(identificacaoNegocio.getDataLiquidacao().getSeconds(),identificacaoNegocio.getDataLiquidacao().getNanos());
-            IdentificacaoNegocioDtoInterface identificacaoNegocioDto = new IdentificacaoNegocioDto(identificadorNegocio,corretora,identificacaoClienteNegocio,dataNegocio, dataLiquidacao);
+            long segundosDataNegociacao =identificacaoNegocio.getDataNegocio().getSeconds();
+            int nanosDataNegociacao = identificacaoNegocio.getDataNegocio().getNanos();
+            long segundosDataLiquidacao =identificacaoNegocio.getDataLiquidacao().getSeconds();
+            int nanosDataLiquidacao = identificacaoNegocio.getDataLiquidacao().getNanos();
+
+
+            NegociacaoDto negociacaoDto = new NegociacaoDto(data,identificadorNegocio, corretora, identificacaoClienteNegocio, segundosDataNegociacao, nanosDataNegociacao, segundosDataLiquidacao, nanosDataLiquidacao);
+
             dataProvider.setFlowId(flowId);
             log.logInfo(flowId, sessionId,"Iniciando método GRPC para registro de negociação.");
 
             // executa o caso de uso
-            new FacadeNegociacao().executarRegistrarNegocicacao(dataProvider,identificacaoNegocioDto);
+            new FacadeNegociacao().executarRegistrarNegocicacao(dataProvider,negociacaoDto);
             codResultado = 200;
             msgResultado = "Negociação registrada!";
         }

@@ -1,4 +1,4 @@
-package com.cyrillo.negociacao.core.dataprovider.dto;
+package com.cyrillo.negociacao.infra.dataprovider.dto;
 
 
 import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoDtoInterface;

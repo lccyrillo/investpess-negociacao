@@ -1,15 +1,21 @@
-package com.cyrillo.negociacao.core.dataprovider.dto;
+package com.cyrillo.negociacao.infra.dataprovider.dto;
 
 import com.cyrillo.negociacao.core.dataprovider.tipos.IdentificacaoNegocioDtoInterface;
+import com.google.gson.annotations.Expose;
 import com.google.protobuf.Timestamp;
 
 import java.time.LocalDateTime;
 
 public class IdentificacaoNegocioDto implements IdentificacaoNegocioDtoInterface {
+    @Expose(serialize = true, deserialize = true)
     private String identificadorNegocio;
+    @Expose(serialize = true, deserialize = true)
     private String corretora;
+    @Expose(serialize = true, deserialize = true)
     private String identificacaoClienteNegocio;
+    @Expose(serialize = true, deserialize = true)
     private LocalDateTime dataNegocio;
+    @Expose(serialize = true, deserialize = true)
     private LocalDateTime dataLiquidacao;
 
     public IdentificacaoNegocioDto(String identificadorNegocio, String corretora,String identificacaoClienteNegocio,LocalDateTime dataNegocio, LocalDateTime dataLiquidacao) {
