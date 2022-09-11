@@ -1,5 +1,6 @@
 package com.cyrillo.negociacao.infra.entrypoint.servicogrpc;
 
+import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
 import com.cyrillo.negociacao.infra.dataprovider.dto.IdentificacaoNegocioDto;
 import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
@@ -46,6 +47,10 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
             new FacadeNegociacao().executarRegistrarNegocicacao(dataProvider,negociacaoDto);
             codResultado = 200;
             msgResultado = "Negociação registrada!";
+        }
+        catch (ValoresFinanceirosNaoConferemUseCaseExcecao e) {
+            codResultado = 102;
+            msgResultado = e.getMessage();
         }
         catch (ComunicacaoRepoUseCaseExcecao e) {
             codResultado = 401;

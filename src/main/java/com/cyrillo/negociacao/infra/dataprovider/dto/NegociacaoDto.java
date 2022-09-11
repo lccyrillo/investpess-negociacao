@@ -33,7 +33,7 @@ public class NegociacaoDto implements NegociacaoDtoInterface {
     }
 
     @Override
-    public ValoresFinanceirosNegocioDto getValoresFinanceirosNegocioDto() {
+    public ValoresFinanceirosNegocioDtoInterface getValoresFinanceirosNegocioDtoInterface() {
         return valoresFinanceirosNegocioDto;
     }
 

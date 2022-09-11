@@ -1,29 +1,35 @@
 package com.cyrillo.negociacao.core.usecase;
 
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.NegociacaoDtoInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.*;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
+import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
+import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
+import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.AtivoNegociado;
+
+import java.util.List;
 
 public class RegistrarNegociacao {
 
-    public RegistrarNegociacao(){}
+    public RegistrarNegociacao() {
+    }
 
-    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao  {
+    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao, ValoresFinanceirosNaoConferemUseCaseExcecao {
         // Mapa de resultados do use case
         LogInterface log = data.getLoggingInterface();
         data.setFlowId(flowId);
-        String sessionId =String.valueOf(data.getSessionId());
+        String sessionId = String.valueOf(data.getSessionId());
 
-        log.logInfo(flowId, sessionId,"Iniciando Use Case Incluir Novo Ativo");
-        log.logInfo(flowId,sessionId,"Dados requisição: " + negociacaoDtoInterface.toString());
+        log.logInfo(flowId, sessionId, "Iniciando Use Case RegistrarNegociacao()");
+        log.logInfo(flowId, sessionId, "Dados requisição: " + negociacaoDtoInterface.toString());
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
 
         // 1. Validar dados da negociação
-        // 1.1 - Ativos existentes e são de qual tipo
-        // 1.2 - Os valores financeiros da nota de negociação estão coerentes
+        // 1.1 - Verifica se o valor líquido em conta bate com outros valores informados
+        validarValoresFinanceirosComparadosComValorLiquidoConta(data, flowId, negociacaoDtoInterface);
+        // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
+        validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, flowId, negociacaoDtoInterface);
+
         // 1.3 nota de negociação ainda não existe na base (chave: corretora, numero_nota e usuario)
         // 2. Calcular os itens de custos de cada ação da nota
         // 2.1 - Calcular posição média de cada ação que faz parte da nota
@@ -70,4 +76,71 @@ public class RegistrarNegociacao {
             throw falha;
         }*/
     }
+
+    private void validarValoresFinanceirosComparadosComValorLiquidoConta(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ValoresFinanceirosNaoConferemUseCaseExcecao {
+        // Mapa de resultados do use case
+        LogInterface log = data.getLoggingInterface();
+        String sessionId = String.valueOf(data.getSessionId());
+
+        Double valorComprasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorComprasAVista();
+        Double valorVendasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorVendasAVista();
+        Double valorTaxaLiquidacao = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorTaxaLiquidacao();
+        Double valorEmolumentos = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorEmolumentos();
+        Double valorCorretagem = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorCorretagem();
+        Double valorIss = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorIss();
+        Double valorLiquidoConta = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorLiquidoConta();
+
+        Double valorConferenciaLiquidoConta = (valorComprasAVista + valorTaxaLiquidacao + valorEmolumentos + valorCorretagem
+                + valorIss - valorVendasAVista) * -1;
+
+        // log.logInfo(flowId,sessionId,"valorConferenciaLiquidoConta: " + valorConferenciaLiquidoConta.toString());
+        // log.logInfo(flowId,sessionId,"valorLiquidoConta: " + valorLiquidoConta.toString());
+
+
+        // Comparação de valores double em java.
+        double epsilon = 0.0000001d;
+        if (Math.abs(valorConferenciaLiquidoConta - valorLiquidoConta) >= epsilon) {
+            throw new ValoresFinanceirosNaoConferemUseCaseExcecao("Valor de conferência de líquido para conta não confere com valor informado!");
+        }
+    }
+
+    private void validarValoresFinanceirosAtivosComparadosComValorVendasECompras(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ValoresFinanceirosNaoConferemUseCaseExcecao {
+        // Mapa de resultados do use case
+        LogInterface log = data.getLoggingInterface();
+        String sessionId = String.valueOf(data.getSessionId());
+
+        Double valorComprasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorComprasAVista();
+        Double valorVendasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorVendasAVista();
+
+
+
+        // Loop por todos os ativos somando as compras e vendas
+        AtivoNegociadoDtoInterface ativoNegociadoDtoInterface;
+        Double valorSomadoComprasAVista = 0.0;
+        Double valorSomadoVendasAVista = 0.0;
+        Double valorNegocio;
+        List<AtivoNegociadoDtoInterface> listaAtivoNegociado = negociacaoDtoInterface.listarTodosAtivos();
+        for (int i = 0; i < listaAtivoNegociado.size(); i++) {
+            ativoNegociadoDtoInterface = negociacaoDtoInterface.listarTodosAtivos().get(i);
+            valorNegocio = ativoNegociadoDtoInterface.getValorNegocio();
+            if (ativoNegociadoDtoInterface.getTipoNegocio() == 1) {
+                valorSomadoComprasAVista = valorSomadoComprasAVista + valorNegocio;
+            } else if (ativoNegociadoDtoInterface.getTipoNegocio() == 2) {
+                valorSomadoVendasAVista = valorSomadoVendasAVista + valorNegocio;
+            }
+        }
+
+        log.logInfo(flowId,sessionId,"valorSomadoVendasAVista: " + valorSomadoVendasAVista.toString());
+        log.logInfo(flowId,sessionId,"valorComprasAVista: " + valorComprasAVista.toString());
+        log.logInfo(flowId,sessionId,"valorSomadoComprasAVista: " + valorSomadoComprasAVista.toString());
+        log.logInfo(flowId,sessionId,"valorVendasAVista: " + valorVendasAVista.toString());
+
+        // Comparação de valores double em java.
+        double epsilon = 0.0000001d;
+        if ((Math.abs(valorSomadoVendasAVista - valorVendasAVista) >= epsilon) || (Math.abs(valorSomadoComprasAVista - valorComprasAVista) >= epsilon)) {
+            throw new ValoresFinanceirosNaoConferemUseCaseExcecao("Valor de compras e vendas dos ativos não conferem com o valor de compras e vendas informados!");
+        }
+    }
+
+
 }

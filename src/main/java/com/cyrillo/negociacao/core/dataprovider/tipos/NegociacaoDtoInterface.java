@@ -7,6 +7,6 @@ import java.util.List;
 public interface NegociacaoDtoInterface {
     public IdentificacaoNegocioDtoInterface getIdentificacaoNegocioDtoInterface();
     public List<AtivoNegociadoDtoInterface> listarTodosAtivos();
-    public ValoresFinanceirosNegocioDto getValoresFinanceirosNegocioDto();
+    public ValoresFinanceirosNegocioDtoInterface getValoresFinanceirosNegocioDtoInterface();
     public String toString();
 }
