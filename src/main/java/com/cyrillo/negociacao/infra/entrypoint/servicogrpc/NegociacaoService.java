@@ -1,5 +1,6 @@
 package com.cyrillo.negociacao.infra.entrypoint.servicogrpc;
 
+import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
 import com.cyrillo.negociacao.infra.dataprovider.dto.IdentificacaoNegocioDto;
 import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.IdentificacaoNegocioDtoInterface;
@@ -7,14 +8,13 @@ import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ParametrosInvalidosUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.NegociacaoDto;
-import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.IdentificacaoNegocio;
-import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.NegociacaoServiceGrpc;
-import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.RegistraNegociacaoRequest;
-import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.RegistraNegociacaoResponse;
+import com.cyrillo.negociacao.infra.dataprovider.dto.ValoresFinanceirosNegocioDto;
+import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.*;
 import com.cyrillo.negociacao.infra.facade.FacadeNegociacao;
 import io.grpc.stub.StreamObserver;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceImplBase {
     private DataProviderInterface data;
@@ -36,21 +36,11 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
 
             // Captura dados da requisição
             String flowId = request.getFlowId();
-
-            IdentificacaoNegocio identificacaoNegocio = request.getIdentificacaoNegocio();
-            String identificadorNegocio = identificacaoNegocio.getIdentificadorNegocio();
-            String corretora = identificacaoNegocio.getCorretoraNegocio();
-            String identificacaoClienteNegocio = identificacaoNegocio.getIdentificacaoClienteNegocio();
-            long segundosDataNegociacao =identificacaoNegocio.getDataNegocio().getSeconds();
-            int nanosDataNegociacao = identificacaoNegocio.getDataNegocio().getNanos();
-            long segundosDataLiquidacao =identificacaoNegocio.getDataLiquidacao().getSeconds();
-            int nanosDataLiquidacao = identificacaoNegocio.getDataLiquidacao().getNanos();
-
-
-            NegociacaoDto negociacaoDto = new NegociacaoDto(data,identificadorNegocio, corretora, identificacaoClienteNegocio, segundosDataNegociacao, nanosDataNegociacao, segundosDataLiquidacao, nanosDataLiquidacao);
-
             dataProvider.setFlowId(flowId);
             log.logInfo(flowId, sessionId,"Iniciando método GRPC para registro de negociação.");
+
+            // Montagem do Objeto DTO para iniciar o caso de uso
+            NegociacaoDto negociacaoDto = geraObjetoDtoComObjetoRequisicao(request);
 
             // executa o caso de uso
             new FacadeNegociacao().executarRegistrarNegocicacao(dataProvider,negociacaoDto);
@@ -73,6 +63,41 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    private NegociacaoDto geraObjetoDtoComObjetoRequisicao(RegistraNegociacaoRequest requisicao){
+        IdentificacaoNegocio identificacaoNegocio = requisicao.getIdentificacaoNegocio();
+        String identificadorNegocio = identificacaoNegocio.getIdentificadorNegocio();
+        String corretora = identificacaoNegocio.getCorretoraNegocio();
+        String identificacaoClienteNegocio = identificacaoNegocio.getIdentificacaoClienteNegocio();
+        long segundosDataNegociacao =identificacaoNegocio.getDataNegocio().getSeconds();
+        int nanosDataNegociacao = identificacaoNegocio.getDataNegocio().getNanos();
+        long segundosDataLiquidacao =identificacaoNegocio.getDataLiquidacao().getSeconds();
+        int nanosDataLiquidacao = identificacaoNegocio.getDataLiquidacao().getNanos();
+        IdentificacaoNegocioDto identificacaoNegocioDto = new IdentificacaoNegocioDto(this.data,identificadorNegocio, corretora,identificacaoClienteNegocio, segundosDataNegociacao, nanosDataNegociacao, segundosDataLiquidacao, nanosDataLiquidacao);
+
+
+        ValoresFinanceirosNegocio valoresFinanceirosNegocio = requisicao.getValoresFinanceiros();
+        Double valorVendasAVista = valoresFinanceirosNegocio.getValorVendasAVista();
+        Double valorComprasAVista = valoresFinanceirosNegocio.getValorComprasAVista();
+        Double valorTaxaLiquidacao = valoresFinanceirosNegocio.getValorTaxaLiquidacao();
+        Double valorEmolumentos = valoresFinanceirosNegocio.getValorEmolumentos();
+        Double valorCorretagem = valoresFinanceirosNegocio.getValorCorretagem();
+        Double valorIss = valoresFinanceirosNegocio.getValorIss();
+        Double valorIrrf = valoresFinanceirosNegocio.getValorIrrf();
+        Double valorLiquidoConta = valoresFinanceirosNegocio.getValorLiquidoConta();
+
+        ValoresFinanceirosNegocioDto valoresFinanceirosNegocioDto = new ValoresFinanceirosNegocioDto(this.data,valorVendasAVista,valorComprasAVista,valorTaxaLiquidacao,valorEmolumentos,valorCorretagem,valorIss,valorIrrf,valorLiquidoConta);
+        NegociacaoDto negociacaoDto = new NegociacaoDto(this.data,identificacaoNegocioDto, valoresFinanceirosNegocioDto);
+
+        // Para cada Ativo Negociado existente, inclui no objeto de Negociacao
+        List<AtivoNegociado> listaAtivoNegociado = requisicao.getAtivosNegociadosList();
+        AtivoNegociado ativoNegociado;
+        for (int i = 0; i < listaAtivoNegociado.size(); i++) {
+            ativoNegociado = listaAtivoNegociado.get(i);
+            negociacaoDto.adicionarAtivoNegociado(new AtivoNegociadoDto(ativoNegociado.getSiglaAtivo(),ativoNegociado.getTipoNegocio(),ativoNegociado.getQuantidadeNegociada(),ativoNegociado.getPrecoNegociado()));
+        }
+        return negociacaoDto;
     }
 
 }

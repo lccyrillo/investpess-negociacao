@@ -3,24 +3,28 @@ package com.cyrillo.negociacao.infra.dataprovider.dto;
 import com.cyrillo.negociacao.core.dataprovider.tipos.*;
 import com.google.gson.annotations.Expose;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NegociacaoDto implements NegociacaoDtoInterface {
+
+
     @Expose(serialize = true, deserialize = true)
     private IdentificacaoNegocioDto identificacaoNegocioDto;
     @Expose(serialize = true, deserialize = true)
-    private List<AtivoNegociadoDto> listaAtivoNegociado = new ArrayList<>();
-    @Expose(serialize = false, deserialize = false)
-    UtilitarioInterface meuUtilitario;
+    private ValoresFinanceirosNegocioDto valoresFinanceirosNegocioDto;
+    @Expose(serialize = true, deserialize = true)
+    private List<AtivoNegociadoDtoInterface> listaAtivoNegociado = new ArrayList<>();
 
-    public NegociacaoDto(DataProviderInterface data,String identificadorNegocio, String corretora, String identificacaoClienteNegocio,  long segundosDataNegociacao, int nanosDataNegociacao, long segundosDataLiquidacao, int nanosDataLiquidacao){
+
+    @Expose(serialize = false, deserialize = false)
+    private UtilitarioInterface meuUtilitario;
+
+
+    public NegociacaoDto(DataProviderInterface data,IdentificacaoNegocioDto identificacaoNegocioDto, ValoresFinanceirosNegocioDto valoresFinanceirosNegocioDto){
         meuUtilitario = data.getUtilitario();
-        LocalDateTime dataNegocio = meuUtilitario.converterGoogleProtobufTimeStampParaLocalDateTime(segundosDataNegociacao,nanosDataNegociacao);
-        LocalDateTime dataLiquidacao = meuUtilitario.converterGoogleProtobufTimeStampParaLocalDateTime(segundosDataLiquidacao, nanosDataLiquidacao);
-        identificacaoNegocioDto = new IdentificacaoNegocioDto(identificadorNegocio,corretora,identificacaoClienteNegocio,dataNegocio, dataLiquidacao);
-        //data.getLoggingInterface().logInfo("1","2",data.converterObjetoParaJson(this));
+        this.identificacaoNegocioDto = identificacaoNegocioDto;
+        this.valoresFinanceirosNegocioDto = valoresFinanceirosNegocioDto;
     }
 
     @Override
@@ -29,13 +33,21 @@ public class NegociacaoDto implements NegociacaoDtoInterface {
     }
 
     @Override
-    public List<AtivoNegociadoDtoInterface> listarTodosAtivos() {
-        return null;
+    public ValoresFinanceirosNegocioDto getValoresFinanceirosNegocioDto() {
+        return valoresFinanceirosNegocioDto;
     }
 
     @Override
     public String toString(){
-        //return null;
         return meuUtilitario.converterObjetoParaJson(this);
+    }
+
+    @Override
+    public List<AtivoNegociadoDtoInterface> listarTodosAtivos() {
+        return this.listaAtivoNegociado;
+    }
+
+    public void adicionarAtivoNegociado(AtivoNegociadoDto ativoNegociadoDto) {
+        this.listaAtivoNegociado.add(ativoNegociadoDto);
     }
 }

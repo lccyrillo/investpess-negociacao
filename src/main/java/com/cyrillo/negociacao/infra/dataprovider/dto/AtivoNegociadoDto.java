@@ -7,10 +7,13 @@ import com.google.gson.annotations.Expose;
 public class AtivoNegociadoDto implements AtivoNegociadoDtoInterface {
     @Expose(serialize = true, deserialize = true)
     private String sigla;
+
     @Expose(serialize = true, deserialize = true)
     private int tipoNegocio;
+
     @Expose(serialize = true, deserialize = true)
     private double quantidadeNegociada;
+
     @Expose(serialize = true, deserialize = true)
     private double precoNegociado;
 

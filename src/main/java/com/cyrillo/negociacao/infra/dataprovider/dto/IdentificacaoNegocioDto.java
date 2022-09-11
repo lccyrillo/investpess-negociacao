@@ -1,8 +1,9 @@
 package com.cyrillo.negociacao.infra.dataprovider.dto;
 
+import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipos.IdentificacaoNegocioDtoInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.UtilitarioInterface;
 import com.google.gson.annotations.Expose;
-import com.google.protobuf.Timestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,13 +18,19 @@ public class IdentificacaoNegocioDto implements IdentificacaoNegocioDtoInterface
     private LocalDateTime dataNegocio;
     @Expose(serialize = true, deserialize = true)
     private LocalDateTime dataLiquidacao;
+    @Expose(serialize = false, deserialize = false)
+    UtilitarioInterface meuUtilitario;
 
-    public IdentificacaoNegocioDto(String identificadorNegocio, String corretora,String identificacaoClienteNegocio,LocalDateTime dataNegocio, LocalDateTime dataLiquidacao) {
+
+    public IdentificacaoNegocioDto(DataProviderInterface data, String identificadorNegocio, String corretora, String identificacaoClienteNegocio, long segundosDataNegociacao, int nanosDataNegociacao, long segundosDataLiquidacao, int nanosDataLiquidacao) {
+        meuUtilitario = data.getUtilitario();
         this.identificadorNegocio = identificadorNegocio;
         this.corretora = corretora;
         this.identificacaoClienteNegocio = identificacaoClienteNegocio;
         this.dataNegocio = dataNegocio;
         this.dataLiquidacao = dataLiquidacao;
+        this.dataNegocio = meuUtilitario.converterGoogleProtobufTimeStampParaLocalDateTime(segundosDataNegociacao,nanosDataNegociacao);
+        this.dataLiquidacao = meuUtilitario.converterGoogleProtobufTimeStampParaLocalDateTime(segundosDataLiquidacao, nanosDataLiquidacao);
     }
 
     public String getIdentificadorNegocio() {
@@ -47,6 +54,6 @@ public class IdentificacaoNegocioDto implements IdentificacaoNegocioDtoInterface
     }
 
     public String toString() {
-      return "Identificador Negócio: " + identificadorNegocio + " | " + "Cliente: " + identificacaoClienteNegocio + " | " + "Corretora: " + corretora + " | " + "Data Negócio: " + dataNegocio.toString();
+        return meuUtilitario.converterObjetoParaJson(this);
     }
 }

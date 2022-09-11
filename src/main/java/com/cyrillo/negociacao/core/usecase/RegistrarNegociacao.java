@@ -18,7 +18,20 @@ public class RegistrarNegociacao {
         String sessionId =String.valueOf(data.getSessionId());
 
         log.logInfo(flowId, sessionId,"Iniciando Use Case Incluir Novo Ativo");
+        log.logInfo(flowId,sessionId,"Dados requisição: " + negociacaoDtoInterface.toString());
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
+
+        // 1. Validar dados da negociação
+        // 1.1 - Ativos existentes e são de qual tipo
+        // 1.2 - Os valores financeiros da nota de negociação estão coerentes
+        // 1.3 nota de negociação ainda não existe na base (chave: corretora, numero_nota e usuario)
+        // 2. Calcular os itens de custos de cada ação da nota
+        // 2.1 - Calcular posição média de cada ação que faz parte da nota
+        // 2.2 - Somar todo o valor financeiro e calcular a parte de cutos de cada ação
+        // 2.3 - Guardar o ponto de ação calculado (data / ação / corretora / usuario)
+        // 3. Precisa ser recalculada a posição da ação ( avaliar realizar esses recálculos através de outro microsserviço notificado através de um kafka
+        // 3.1 recalcular a curva de posicao da ação a partir da data do ponto de ação calculado (posição: data, ação. usuario e corretora) , considerar data como datas do ponto de ação, data de final de mes e data atual.
+        // 3.2 Se for operação vendida, precisar recalcular a curva de vendas mensais e imposto de renda
 
 
   /*      sigla = sigla.toUpperCase();
