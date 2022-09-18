@@ -1,8 +1,10 @@
 package com.cyrillo.negociacao.core.usecase;
 
 
+import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 import com.cyrillo.negociacao.core.dataprovider.tipos.*;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
+import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.AtivoNegociado;
@@ -14,7 +16,7 @@ public class RegistrarNegociacao {
     public RegistrarNegociacao() {
     }
 
-    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao, ValoresFinanceirosNaoConferemUseCaseExcecao {
+    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao, ValoresFinanceirosNaoConferemUseCaseExcecao, NotaNegociacaoExistenteUseCaseExcecao {
         // Mapa de resultados do use case
         LogInterface log = data.getLoggingInterface();
         data.setFlowId(flowId);
@@ -24,13 +26,38 @@ public class RegistrarNegociacao {
         log.logInfo(flowId, sessionId, "Dados requisição: " + negociacaoDtoInterface.toString());
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
 
+
         // 1. Validar dados da negociação
         // 1.1 - Verifica se o valor líquido em conta bate com outros valores informados
         validarValoresFinanceirosComparadosComValorLiquidoConta(data, flowId, negociacaoDtoInterface);
         // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
         validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, flowId, negociacaoDtoInterface);
-
         // 1.3 nota de negociação ainda não existe na base (chave: corretora, numero_nota e usuario)
+        // Preciso chamar repositorio de notas de corretagem para verificar se a note já existe
+        NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
+        String identificador = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getIdentificadorNegocio();
+        String cliente = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getIdentificacaoClienteNegocio();
+        String corretora = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getCorretora();
+        try {
+            if (notaNegociacaoRepositorio.consultarNotaNegociacao(data, identificador,corretora,cliente ) == false) {
+                // segue o fluxo
+                log.logInfo(flowId, sessionId, "Nota negociação não existe. Vamos cadastrar.");
+            }
+            else {
+                log.logInfo(flowId, sessionId, "Nota negociação já existe no repositório: " + negociacaoDtoInterface.toString());
+                throw new NotaNegociacaoExistenteUseCaseExcecao("Nota negociação já existe no repositório.");
+            }
+
+        }
+        catch (ComunicacaoRepoDataProvExcecao e) {
+            ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com Repositório: AtivoRepositorio");
+            falha.addSuppressed(e);
+            log.logError(flowId, sessionId, "Erro na comunicação com repositório.");
+            e.printStackTrace();
+            throw falha;
+        }
+
+
         // 2. Calcular os itens de custos de cada ação da nota
         // 2.1 - Calcular posição média de cada ação que faz parte da nota
         // 2.2 - Somar todo o valor financeiro e calcular a parte de cutos de cada ação

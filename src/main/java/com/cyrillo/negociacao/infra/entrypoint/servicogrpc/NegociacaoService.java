@@ -1,5 +1,6 @@
 package com.cyrillo.negociacao.infra.entrypoint.servicogrpc;
 
+import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
 import com.cyrillo.negociacao.infra.dataprovider.dto.IdentificacaoNegocioDto;
@@ -59,6 +60,10 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
         catch (ParametrosInvalidosUseCaseExcecao e) {
             codResultado = 401;
             msgResultado = "Erro na persistência do Ativo no banco de dados!";
+        } catch (NotaNegociacaoExistenteUseCaseExcecao e) {
+            codResultado = 101;
+            msgResultado = e.getMessage();
+
         }
         //Formata objeto de saída
         RegistraNegociacaoResponse response = RegistraNegociacaoResponse.newBuilder()

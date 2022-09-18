@@ -1,9 +1,6 @@
 package com.cyrillo.negociacao.infra.config;
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.UtilitarioInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.*;
 import com.google.gson.Gson;
 
 import java.time.LocalDateTime;
@@ -58,6 +55,11 @@ public class Sessao implements DataProviderInterface {
 
     public UtilitarioInterface getUtilitario(){
         return Aplicacao.getInstance().getUtilitario();
+    }
+
+    @Override
+    public NotaNegociacaoRepositorioInterface getNotaNegocicacaoRepositorio() {
+        return Aplicacao.getInstance().getNotaNegocicacaoRepositorio();
     }
 
 }

@@ -1,12 +1,10 @@
 package com.cyrillo.negociacao.infra.config;
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.UtilitarioInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipos.*;
 import com.cyrillo.negociacao.infra.config.excecao.PropriedadeInvalidaConfigExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.AtivoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.LogInterfaceImplConsole;
+import com.cyrillo.negociacao.infra.dataprovider.NotaNegociacaoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.NegociacaoServerGRPC;
 import com.cyrillo.negociacao.infra.util.Utilitario;
 
@@ -29,6 +27,7 @@ public class Aplicacao implements DataProviderInterface {
     private UUID sessionId;
     private String flowId;
     private Utilitario utilitario;
+    private NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio;
 
 
 
@@ -56,6 +55,7 @@ public class Aplicacao implements DataProviderInterface {
             this.logAplicacao.logInfo(null,null, "Propriedades de configuração da aplicação carregadas!");
             this.logAplicacao.logInfo(null,null, getConfiguracoesAplicacao());
             utilitario = new Utilitario();
+            notaNegociacaoRepositorio = new NotaNegociacaoRepositorioImplMemoria();
             NegociacaoServerGRPC var = new NegociacaoServerGRPC(this);
 
 
@@ -179,6 +179,7 @@ public class Aplicacao implements DataProviderInterface {
         return utilitario;
     }
 
+    public NotaNegociacaoRepositorioInterface getNotaNegocicacaoRepositorio() {return notaNegociacaoRepositorio;}
 
 
 }
