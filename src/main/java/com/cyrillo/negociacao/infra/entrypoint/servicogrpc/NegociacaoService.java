@@ -55,7 +55,7 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
         }
         catch (ComunicacaoRepoUseCaseExcecao e) {
             codResultado = 401;
-            msgResultado = "Erro na persistência do Ativo no banco de dados!";
+            msgResultado = "Erro na comunicação com repositório de dados!";
         }
         catch (ParametrosInvalidosUseCaseExcecao e) {
             codResultado = 401;
