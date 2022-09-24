@@ -5,19 +5,18 @@ import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvE
 import com.cyrillo.negociacao.core.dataprovider.tipo.*;
 import com.cyrillo.negociacao.core.entidade.NotaNegociacao;
 import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
-import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
-import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;
-import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
+import com.cyrillo.negociacao.core.usecase.excecao.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class RegistrarNegociacao {
 
     public RegistrarNegociacao() {
     }
 
-    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao, ValoresFinanceirosNaoConferemUseCaseExcecao, NotaNegociacaoExistenteUseCaseExcecao {
+    public void executar(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoUseCaseExcecao, ValoresFinanceirosNaoConferemUseCaseExcecao, NotaNegociacaoExistenteUseCaseExcecao, AtivoNaoIdentificadoUseCaseExcecao, AtivoNaoEAcaoUseCaseExcecao {
         // Mapa de resultados do use case
         LogInterface log = data.getLoggingInterface();
         data.setFlowId(flowId);
@@ -33,14 +32,12 @@ public class RegistrarNegociacao {
             log.logInfo(flowId, sessionId,notaNegociacao.toJson());
             // 1.2 Verifico se a nota de Negociação já existe no repositório
             validarNotaNegociacaoJaExisteRepositorio(data, notaNegociacao);
-            // 1.3 - Verifica se o valor líquido em conta bate com outros valores informados
+            // 1.3 - Atualizo os Dados Financeido e Verifico se o valor líquido em conta bate com outros valores informados
             atualizar_e_ValidarValoresFinanceirosNotaNegociacao(data, notaNegociacao,negociacaoDtoInterface);
+            // 1.4 - Atualizo os movmientos financeiros na nota de negociação e valido se são do tipo ação
+            atualizarMovimentacoesNotaNegociacao(data, notaNegociacao,negociacaoDtoInterface);
 
 
-            // 1.2 Atualiza o objeto Nota de Negociacao com os valores de Negociacao
-
-
-            // 1. Validar dados da negociação
 
             // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
             validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, negociacaoDtoInterface);
@@ -146,6 +143,38 @@ public class RegistrarNegociacao {
             log.logInfo(flowId, sessionId,"Valor de conferência de líquido para conta não confere com valor informado!. Nota Negociação: " + notaNegociacao.toJson());
             e.printStackTrace();
             throw falha;
+        }
+    }
+
+
+    private void atualizarMovimentacoesNotaNegociacao(DataProviderInterface data, NotaNegociacao notaNegociacao, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoDataProvExcecao, AtivoNaoEAcaoUseCaseExcecao, AtivoNaoIdentificadoUseCaseExcecao {
+        LogInterface log = data.getLoggingInterface();
+        String sessionId = String.valueOf(data.getSessionId());
+        String flowId = data.getFlowId();
+        // Passo por cada movimento financeiro recebido no request e verifico se existe no repositório e é do tipo ação, se não for, erro
+        // senao, sigo em frente
+
+        AtivoNegociadoDtoInterface ativoNegociadoDtoInterface;
+        List<AtivoNegociadoDtoInterface> listaAtivoNegociado = negociacaoDtoInterface.listarTodosAtivos();
+        AtivoRepositorioInterface ativoRepositorioInterface = data.getAtivoRepositorio();
+        for (int i = 0; i < listaAtivoNegociado.size(); i++) {
+            ativoNegociadoDtoInterface = negociacaoDtoInterface.listarTodosAtivos().get(i);
+            String siglaAtivo = ativoNegociadoDtoInterface.getSigla();
+            Optional<AtivoDtoInterface> ativoDtoInterface = ativoRepositorioInterface.consultarPorSigla(data, siglaAtivo);
+            if (ativoDtoInterface.isPresent()) {
+                // verifico se o ativo é do tipo ação (sistema só sabe processar açao
+                if (ativoDtoInterface.get().getTipoAtivoInt() != 1) {
+                    log.logInfo(flowId,sessionId,"Foi informado um ativo que não é do tipo Ação: "+ siglaAtivo);
+                    throw new AtivoNaoEAcaoUseCaseExcecao("Foi informado um ativo que não é do tipo Ação: "+ siglaAtivo);
+                } else {
+                    //insiro a ação na nota de negociação
+                }
+            } else{
+                // Erro!!
+                // Não existe esse ativo objeto
+                log.logInfo(flowId,sessionId,"Ativo não identificado: "+ siglaAtivo);
+                throw new AtivoNaoIdentificadoUseCaseExcecao("Ativo não identificado: "+ siglaAtivo);
+            }
         }
     }
 

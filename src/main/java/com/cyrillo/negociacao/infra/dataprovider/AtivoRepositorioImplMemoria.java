@@ -8,6 +8,7 @@ import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvE
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AtivoRepositorioImplMemoria implements AtivoRepositorioInterface {
@@ -23,15 +24,20 @@ public class AtivoRepositorioImplMemoria implements AtivoRepositorioInterface {
     }
 
     @Override
-    public boolean consultarPorSigla(DataProviderInterface data, String siglaAtivo) throws ComunicacaoRepoDataProvExcecao {
-        if (this.listaAtivoObjeto.stream()
-            .filter(a -> a.getSigla().equals(siglaAtivo))
-            .findFirst().isPresent()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    public Optional<AtivoDtoInterface> consultarPorSigla(DataProviderInterface data, String siglaAtivo) throws ComunicacaoRepoDataProvExcecao {
+        return this.listaAtivoObjeto.stream()
+                .filter(a -> a.getSigla().equals(siglaAtivo))
+                .findFirst();
+
+
+//        if (this.listaAtivoObjeto.stream()
+//            .filter(a -> a.getSigla().equals(siglaAtivo))
+//            .findFirst().isPresent()) {
+//            return true;
+//        }
+//        else {
+//            return false;
+//        }
     }
 
     @Override

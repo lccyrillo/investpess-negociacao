@@ -1,13 +1,10 @@
 package com.cyrillo.negociacao.infra.entrypoint.servicogrpc;
 
-import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;
-import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
+import com.cyrillo.negociacao.core.usecase.excecao.*;
 import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
 import com.cyrillo.negociacao.infra.dataprovider.dto.IdentificacaoNegocioDto;
 import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipo.LogInterface;
-import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
-import com.cyrillo.negociacao.core.usecase.excecao.ParametrosInvalidosUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.NegociacaoDto;
 import com.cyrillo.negociacao.infra.dataprovider.dto.ValoresFinanceirosNegocioDto;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.*;
@@ -51,6 +48,14 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
             codResultado = 102;
             msgResultado = e.getMessage();
         }
+        catch (AtivoNaoIdentificadoUseCaseExcecao e) {
+            codResultado = 102;
+            msgResultado = e.getMessage();
+        }
+        catch (AtivoNaoEAcaoUseCaseExcecao e) {
+            codResultado = 102;
+            msgResultado = e.getMessage();
+        }
         catch (ComunicacaoRepoUseCaseExcecao e) {
             codResultado = 401;
             msgResultado = "Erro na comunicação com repositório de dados!";
@@ -58,11 +63,12 @@ public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceIm
         catch (ParametrosInvalidosUseCaseExcecao e) {
             codResultado = 401;
             msgResultado = "Erro na persistência do Ativo no banco de dados!";
-        } catch (NotaNegociacaoExistenteUseCaseExcecao e) {
+        }
+        catch (NotaNegociacaoExistenteUseCaseExcecao e) {
             codResultado = 101;
             msgResultado = e.getMessage();
-
         }
+
         //Formata objeto de saída
         RegistraNegociacaoResponse response = RegistraNegociacaoResponse.newBuilder()
                 .setResponseCode(codResultado)
