@@ -1,11 +1,13 @@
 package com.cyrillo.negociacao.infra.config;
 
+import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 import com.cyrillo.negociacao.core.dataprovider.tipo.*;
 import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 import com.cyrillo.negociacao.infra.config.excecao.PropriedadeInvalidaConfigExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.AtivoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.LogInterfaceImplConsole;
 import com.cyrillo.negociacao.infra.dataprovider.NotaNegociacaoRepositorioImplMemoria;
+import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoDto;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.NegociacaoServerGRPC;
 import com.cyrillo.negociacao.infra.util.Utilitario;
 
@@ -24,11 +26,11 @@ public class Aplicacao implements DataProviderInterface {
     private List<String> propriedadeLog; // lista de todos os domínios possíveis para a propriedade de log.
     private List<String> propriedadeRepo;// lista de todos os domínios possíveis para a propriedade de log.
     private String repoImplementacao;
-    private AtivoRepositorioInterface ativoRepositorio;
     private UUID sessionId;
     private String flowId;
     private Utilitario utilitario;
     private NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio;
+    private AtivoRepositorioInterface ativoRepositorio;
 
 
 
@@ -56,7 +58,8 @@ public class Aplicacao implements DataProviderInterface {
             this.logAplicacao.logInfo(null,null, "Propriedades de configuração da aplicação carregadas!");
             this.logAplicacao.logInfo(null,null, getConfiguracoesAplicacao());
             utilitario = new Utilitario();
-            notaNegociacaoRepositorio = new NotaNegociacaoRepositorioImplMemoria();
+
+            prepararBaseDadosMemoria();
             NegociacaoServerGRPC var = new NegociacaoServerGRPC(this);
 
 
@@ -162,8 +165,10 @@ public class Aplicacao implements DataProviderInterface {
             //this.ativoRepositorio = new AtivoRepositorioImplcomJDBC();
        // }
        // else {
-            this.ativoRepositorio = new AtivoRepositorioImplMemoria();
-       // }
+        this.ativoRepositorio = new AtivoRepositorioImplMemoria();
+        this.notaNegociacaoRepositorio = new NotaNegociacaoRepositorioImplMemoria();
+
+        // }
     }
 
 
@@ -182,5 +187,25 @@ public class Aplicacao implements DataProviderInterface {
 
     public NotaNegociacaoRepositorioInterface getNotaNegocicacaoRepositorio() {return notaNegociacaoRepositorio;}
 
+
+
+    private void prepararBaseDadosMemoria(){
+        AtivoDtoInterface ativoObjeto;
+
+        try {
+            ativoObjeto= new AtivoDto("COGN3","COGN3","02.800.026/0001-40",1);
+            this.getAtivoRepositorio().incluir(this,ativoObjeto);
+            ativoObjeto= new AtivoDto("ITUB4","ITUB4","02.800.026/0001-40",1);
+            this.getAtivoRepositorio().incluir(this,ativoObjeto);
+            ativoObjeto= new AtivoDto("MGLU3","MGLU3","02.800.026/0001-40",1);
+            this.getAtivoRepositorio().incluir(this,ativoObjeto);
+            ativoObjeto= new AtivoDto("CSNA3","CSNA3","02.800.026/0001-40",1);
+            this.getAtivoRepositorio().incluir(this,ativoObjeto);
+
+
+        } catch (ComunicacaoRepoDataProvExcecao e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
