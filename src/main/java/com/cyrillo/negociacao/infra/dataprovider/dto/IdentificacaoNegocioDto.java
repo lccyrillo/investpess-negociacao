@@ -5,6 +5,7 @@ import com.cyrillo.negociacao.core.dataprovider.tipo.IdentificacaoNegocioDtoInte
 import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 import com.google.gson.annotations.Expose;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class IdentificacaoNegocioDto implements IdentificacaoNegocioDtoInterface {
@@ -27,11 +28,19 @@ public class IdentificacaoNegocioDto implements IdentificacaoNegocioDtoInterface
         this.identificadorNegocio = identificadorNegocio;
         this.corretora = corretora;
         this.identificacaoClienteNegocio = identificacaoClienteNegocio;
-        this.dataNegocio = dataNegocio;
-        this.dataLiquidacao = dataLiquidacao;
         this.dataNegocio = meuUtilitario.converterGoogleProtobufTimeStampParaLocalDateTime(segundosDataNegociacao,nanosDataNegociacao);
         this.dataLiquidacao = meuUtilitario.converterGoogleProtobufTimeStampParaLocalDateTime(segundosDataLiquidacao, nanosDataLiquidacao);
     }
+
+    public IdentificacaoNegocioDto(DataProviderInterface data, String identificadorNegocio, String corretora, String identificacaoClienteNegocio, LocalDate dataNegociacao, LocalDate dataLiquidacao) {
+        meuUtilitario = data.getUtilitario();
+        this.identificadorNegocio = identificadorNegocio;
+        this.corretora = corretora;
+        this.identificacaoClienteNegocio = identificacaoClienteNegocio;
+        this.dataNegocio = dataNegociacao.atStartOfDay();
+        this.dataLiquidacao = dataLiquidacao.atStartOfDay();
+    }
+
 
     public String getIdentificadorNegocio() {
         return identificadorNegocio;

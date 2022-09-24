@@ -3,6 +3,7 @@ package com.cyrillo.negociacao.core.entidade;
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 import com.cyrillo.negociacao.core.dataprovider.tipo.AtivoDtoInterface;
 import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.NotaNegociacaoInterface;
 import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class NotaNegociacao {
+public class NotaNegociacao implements NotaNegociacaoInterface {
     @Expose(serialize = true, deserialize = true)
     private String identificadorNegocio;
     @Expose(serialize = true, deserialize = true)
@@ -69,6 +70,7 @@ public class NotaNegociacao {
     public String getIdentificadorNegocio() {
         return identificadorNegocio;
     }
+
 
     public String getCorretora() {
         return corretora;

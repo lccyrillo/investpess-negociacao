@@ -7,6 +7,7 @@ import com.cyrillo.negociacao.core.entidade.NotaNegociacao;
 import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,8 @@ public class RegistrarNegociacao {
             // Passos que faltam
             // 24/09/2022
             // 1.6 Persistir Nota de Negociação
+            NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
+            notaNegociacaoRepositorio.armazenarNotaNegociacao(data,notaNegociacao);
             // 1.7 Notificar serviço para calcular posiçao e resultado na venda
 
         } catch (ComunicacaoRepoDataProvExcecao e) {
@@ -121,7 +124,8 @@ public class RegistrarNegociacao {
         String identificador = notaNegociacao.getIdentificadorNegocio();
         String cliente = notaNegociacao.getIdentificacaoClienteNegocio();
         String corretora = notaNegociacao.getCorretora();
-        if (notaNegociacaoRepositorio.consultarNotaNegociacao(data, identificador,corretora,cliente ) == true) {
+        LocalDate dataNegocio = notaNegociacao.getDataNegocio();
+        if (notaNegociacaoRepositorio.consultarNotaNegociacao(data, identificador,corretora,cliente ,dataNegocio) == true) {
             log.logInfo(flowId, sessionId, "Nota negociação já existe no repositório: " + notaNegociacao.toString());
             throw new NotaNegociacaoExistenteUseCaseExcecao("Nota negociação já existe no repositório.");
         }
