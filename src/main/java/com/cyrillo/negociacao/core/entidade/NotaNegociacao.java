@@ -1,6 +1,8 @@
 package com.cyrillo.negociacao.core.entidade;
 
+import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
+import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
 import com.google.gson.annotations.Expose;
 
 import java.time.LocalDate;
@@ -19,6 +21,22 @@ public class NotaNegociacao {
     private LocalDate dataLiquidacao;
     @Expose(serialize = false, deserialize = false)
     private UtilitarioInterface utilitario;
+
+    @Expose(serialize = true, deserialize = true)
+    private Double valorComprasAVista;
+    @Expose(serialize = true, deserialize = true)
+    private Double valorVendasAVista;
+    @Expose(serialize = true, deserialize = true)
+    private Double valorTaxaLiquidacao;
+    @Expose(serialize = true, deserialize = true)
+    private Double valorEmolumentos;
+    @Expose(serialize = true, deserialize = true)
+    private Double valorCorretagem;
+    @Expose(serialize = true, deserialize = true)
+    private Double valorIss;
+    @Expose(serialize = true, deserialize = true)
+    private Double valorLiquidoConta;
+
 
     public NotaNegociacao(UtilitarioInterface utilitario, String identificadorNegocio, String corretora, String identificacaoClienteNegocio, LocalDateTime dataNegocio, LocalDateTime dataLiquidacao) {
         this.utilitario = utilitario;
@@ -58,6 +76,31 @@ public class NotaNegociacao {
 
     public LocalDate getDataLiquidacao() {
         return dataLiquidacao;
+    }
+
+    public void atualizaValoresFinanceiros(Double valorComprasAVista, Double valorVendasAVista, Double valorTaxaLiquidacao, Double valorEmolumentos, Double valorCorretagem, Double valorIss, Double valorLiquidoConta) {
+        this.valorComprasAVista=valorComprasAVista;
+        this.valorVendasAVista=valorVendasAVista;
+        this.valorTaxaLiquidacao=valorTaxaLiquidacao;
+        this.valorEmolumentos=valorEmolumentos;
+        this.valorCorretagem=valorCorretagem;
+        this.valorIss=valorIss;
+        this.valorLiquidoConta=valorLiquidoConta;
+    }
+
+    public void validarValoresFinanceirosComparadosComValorLiquidoConta() throws ValoresFinanceirosNaoConferemEntidadeExcecao {
+        Double valorConferenciaLiquidoConta = (valorComprasAVista + valorTaxaLiquidacao + valorEmolumentos + valorCorretagem
+                + valorIss - valorVendasAVista) * -1;
+
+        // log.logInfo(flowId,sessionId,"valorConferenciaLiquidoConta: " + valorConferenciaLiquidoConta.toString());
+        // log.logInfo(flowId,sessionId,"valorLiquidoConta: " + valorLiquidoConta.toString());
+
+
+        // Comparação de valores double em java.
+        double epsilon = 0.0000001d;
+        if (Math.abs(valorConferenciaLiquidoConta - valorLiquidoConta) >= epsilon) {
+            throw new ValoresFinanceirosNaoConferemEntidadeExcecao("Valor de conferência de líquido para conta não confere com valor informado!");
+        }
     }
 
 

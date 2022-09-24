@@ -4,6 +4,7 @@ package com.cyrillo.negociacao.core.usecase;
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 import com.cyrillo.negociacao.core.dataprovider.tipo.*;
 import com.cyrillo.negociacao.core.entidade.NotaNegociacao;
+import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
@@ -28,20 +29,21 @@ public class RegistrarNegociacao {
 
         try {
             // 1.1 Cria Objeto NotaNegociacao
-            NotaNegociacao notaNegociacao = criarObjetoNotaNegociacao(data, flowId, negociacaoDtoInterface);
+            NotaNegociacao notaNegociacao = criarObjetoNotaNegociacao(data, negociacaoDtoInterface);
             log.logInfo(flowId, sessionId,notaNegociacao.toJson());
             // 1.2 Verifico se a nota de Negociação já existe no repositório
-            validarNotaNegociacaoJaExisteRepositorio(data, flowId, notaNegociacao);
+            validarNotaNegociacaoJaExisteRepositorio(data, notaNegociacao);
+            // 1.3 - Verifica se o valor líquido em conta bate com outros valores informados
+            atualizar_e_ValidarValoresFinanceirosNotaNegociacao(data, notaNegociacao,negociacaoDtoInterface);
 
 
             // 1.2 Atualiza o objeto Nota de Negociacao com os valores de Negociacao
 
 
             // 1. Validar dados da negociação
-            // 1.1 - Verifica se o valor líquido em conta bate com outros valores informados
-            validarValoresFinanceirosComparadosComValorLiquidoConta(data, flowId, negociacaoDtoInterface);
+
             // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
-            validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, flowId, negociacaoDtoInterface);
+            validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, negociacaoDtoInterface);
             // 1.4 preciso validar se todos os ativos existentes na nota existem, e são do tipo ação.
         } catch (ComunicacaoRepoDataProvExcecao e) {
             ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com Repositório: AtivoRepositorio");
@@ -98,7 +100,7 @@ public class RegistrarNegociacao {
         }*/
     }
 
-    private NotaNegociacao criarObjetoNotaNegociacao(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
+    private NotaNegociacao criarObjetoNotaNegociacao(DataProviderInterface data, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
         LogInterface log = data.getLoggingInterface();
         String sessionId = String.valueOf(data.getSessionId());
         NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
@@ -110,54 +112,49 @@ public class RegistrarNegociacao {
         return new NotaNegociacao(data.getUtilitario(),identificador,corretora,cliente,dataNegocio, dataLiquidacao);
     }
 
-    private void validarNotaNegociacaoJaExisteRepositorio(DataProviderInterface data, String flowId, NotaNegociacao notaNegociacao) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
+    private void validarNotaNegociacaoJaExisteRepositorio(DataProviderInterface data, NotaNegociacao notaNegociacao) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
         LogInterface log = data.getLoggingInterface();
         String sessionId = String.valueOf(data.getSessionId());
+        String flowId = data.getFlowId();
         NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
         String identificador = notaNegociacao.getIdentificadorNegocio();
         String cliente = notaNegociacao.getIdentificacaoClienteNegocio();
         String corretora = notaNegociacao.getCorretora();
-        if (notaNegociacaoRepositorio.consultarNotaNegociacao(data, identificador,corretora,cliente ) == false) {
-            // segue o fluxo
-            log.logInfo(flowId, sessionId, "Nota negociação não existe. Vamos cadastrar.");
-        }
-        else {
+        if (notaNegociacaoRepositorio.consultarNotaNegociacao(data, identificador,corretora,cliente ) == true) {
             log.logInfo(flowId, sessionId, "Nota negociação já existe no repositório: " + notaNegociacao.toString());
             throw new NotaNegociacaoExistenteUseCaseExcecao("Nota negociação já existe no repositório.");
         }
     }
 
-    private void validarValoresFinanceirosComparadosComValorLiquidoConta(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ValoresFinanceirosNaoConferemUseCaseExcecao {
-        // Mapa de resultados do use case
+    private void atualizar_e_ValidarValoresFinanceirosNotaNegociacao(DataProviderInterface data, NotaNegociacao notaNegociacao,NegociacaoDtoInterface negociacaoDtoInterface) throws ValoresFinanceirosNaoConferemUseCaseExcecao {
         LogInterface log = data.getLoggingInterface();
         String sessionId = String.valueOf(data.getSessionId());
-
-        Double valorComprasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorComprasAVista();
-        Double valorVendasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorVendasAVista();
-        Double valorTaxaLiquidacao = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorTaxaLiquidacao();
-        Double valorEmolumentos = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorEmolumentos();
-        Double valorCorretagem = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorCorretagem();
-        Double valorIss = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorIss();
-        Double valorLiquidoConta = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorLiquidoConta();
-
-        Double valorConferenciaLiquidoConta = (valorComprasAVista + valorTaxaLiquidacao + valorEmolumentos + valorCorretagem
-                + valorIss - valorVendasAVista) * -1;
-
-        // log.logInfo(flowId,sessionId,"valorConferenciaLiquidoConta: " + valorConferenciaLiquidoConta.toString());
-        // log.logInfo(flowId,sessionId,"valorLiquidoConta: " + valorLiquidoConta.toString());
-
-
-        // Comparação de valores double em java.
-        double epsilon = 0.0000001d;
-        if (Math.abs(valorConferenciaLiquidoConta - valorLiquidoConta) >= epsilon) {
-            throw new ValoresFinanceirosNaoConferemUseCaseExcecao("Valor de conferência de líquido para conta não confere com valor informado!");
+        String flowId = data.getFlowId();
+        try {
+            Double valorComprasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorComprasAVista();
+            Double valorVendasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorVendasAVista();
+            Double valorTaxaLiquidacao = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorTaxaLiquidacao();
+            Double valorEmolumentos = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorEmolumentos();
+            Double valorCorretagem = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorCorretagem();
+            Double valorIss = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorIss();
+            Double valorLiquidoConta = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorLiquidoConta();
+            notaNegociacao.atualizaValoresFinanceiros(valorComprasAVista,valorVendasAVista,valorTaxaLiquidacao,valorEmolumentos ,valorCorretagem,valorIss,valorLiquidoConta);
+            notaNegociacao.validarValoresFinanceirosComparadosComValorLiquidoConta();
+        } catch (ValoresFinanceirosNaoConferemEntidadeExcecao e) {
+            ValoresFinanceirosNaoConferemUseCaseExcecao falha = new ValoresFinanceirosNaoConferemUseCaseExcecao("Valor de conferência de líquido para conta não confere com valor informado!.");
+            falha.addSuppressed(e);
+            log.logInfo(flowId, sessionId,"Valor de conferência de líquido para conta não confere com valor informado!. Nota Negociação: " + notaNegociacao.toJson());
+            e.printStackTrace();
+            throw falha;
         }
     }
 
-    private void validarValoresFinanceirosAtivosComparadosComValorVendasECompras(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ValoresFinanceirosNaoConferemUseCaseExcecao {
+
+    private void validarValoresFinanceirosAtivosComparadosComValorVendasECompras(DataProviderInterface data, NegociacaoDtoInterface negociacaoDtoInterface) throws ValoresFinanceirosNaoConferemUseCaseExcecao {
         // Mapa de resultados do use case
         LogInterface log = data.getLoggingInterface();
         String sessionId = String.valueOf(data.getSessionId());
+        String flowId = data.getFlowId();
 
         Double valorComprasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorComprasAVista();
         Double valorVendasAVista = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface().getValorVendasAVista();
