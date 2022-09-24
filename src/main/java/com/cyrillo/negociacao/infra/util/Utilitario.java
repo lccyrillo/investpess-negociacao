@@ -17,6 +17,7 @@ public class Utilitario implements UtilitarioInterface {
         this.meuConversorJson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeConverter())
                 .registerTypeAdapter(LocalDate.class, new LocalDateConverter())
+                .serializeSpecialFloatingPointValues()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
     }

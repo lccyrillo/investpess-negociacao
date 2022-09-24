@@ -1,6 +1,8 @@
 package com.cyrillo.negociacao.core.entidade;
 
+import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 import com.cyrillo.negociacao.core.dataprovider.tipo.AtivoDtoInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
 import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class NotaNegociacao {
     @Expose(serialize = true, deserialize = true)
@@ -114,4 +117,28 @@ public class NotaNegociacao {
         MovimentoAtivo movimentoAtivo = new MovimentoAtivo(sigla,tipoNegocio,quantidadeMovimento,precoMovimentoAtivo, custosTotaisRelativosNota, valorTotalComprasEVendas);
         this.listaMovimentoAtivo.add(movimentoAtivo);
     }
+
+//    private void adicionaMovimentoNaListaParaGarantirUnicidadeAtivo(MovimentoAtivo movimentoAtivo){
+//        // Preciso ver se o movimento novo já existe na lista atual de ativos
+//        String siglaAtivoMovimento = movimentoAtivo.getSigla();
+//        Optional<MovimentoAtivo> movimentoConsolidadoAtivo = this.consultarPorSigla(siglaAtivoMovimento);
+//        if (movimentoConsolidadoAtivo.isPresent()) {
+//            // já existe um movimento ativo e é necessário consolidar
+//            movimentoConsolidadoAtivo.get().adicionarMovimentoMesmoAtivo(movimentoAtivo);
+//        }
+//        else {
+//            // posso adicionar na lista diretamente
+//            this.listaMovimentoAtivo.add(movimentoAtivo);
+//        }
+//    }
+
+    public Optional<MovimentoAtivo> consultarPorSigla(String siglaAtivo) {
+        return this.listaMovimentoAtivo.stream()
+                .filter(a -> a.getSigla().equals(siglaAtivo))
+                .findFirst();
+    }
+
+
+
+
 }

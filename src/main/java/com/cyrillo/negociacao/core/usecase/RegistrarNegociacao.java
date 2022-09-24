@@ -37,11 +37,15 @@ public class RegistrarNegociacao {
             // 1.4 - Atualizo e Incluir os movmientos financeiros na nota de negociação e valido se são do tipo ação
             atualizarMovimentacoesNotaNegociacao(data, notaNegociacao,negociacaoDtoInterface);
             log.logInfo(flowId, sessionId,notaNegociacao.toJson());
-
-
-            // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
+            // 1.5 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
+            // Refatorar ---> Pensar em jogar esse cálculo para dentro da nota de negociacao objeto / não DTO
             validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, negociacaoDtoInterface);
-            // 1.4 preciso validar se todos os ativos existentes na nota existem, e são do tipo ação.
+
+            // Passos que faltam
+            // 24/09/2022
+            // 1.6 Persistir Nota de Negociação
+            // 1.7 Notificar serviço para calcular posiçao e resultado na venda
+
         } catch (ComunicacaoRepoDataProvExcecao e) {
             ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com Repositório: AtivoRepositorio");
             falha.addSuppressed(e);
