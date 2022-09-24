@@ -35,6 +35,7 @@ public class RegistrarNegociacao {
             // 1.3 nota de negociação ainda não existe na base (chave: corretora, numero_nota e usuario)
             // Preciso chamar repositorio de notas de corretagem para verificar se a note já existe
             validarNotaNegociacaoJaExisteRepositorio(data, flowId, negociacaoDtoInterface);
+            // 1.4 preciso validar se todos os ativos existentes na nota existem, e são do tipo ação.
         } catch (ComunicacaoRepoDataProvExcecao e) {
             ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com Repositório: AtivoRepositorio");
             falha.addSuppressed(e);
