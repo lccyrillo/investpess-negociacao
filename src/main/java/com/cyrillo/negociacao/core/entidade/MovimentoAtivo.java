@@ -16,17 +16,23 @@ public class MovimentoAtivo {
     private double quantidadeMovimento;
 
     @Expose(serialize = true, deserialize = true)
-    private double precoMedioMovimentoComCustos;
+    private double precoMovimentoAtivo;
 
     @Expose(serialize = true, deserialize = true)
-    private double precoMedioMovimentoSemCustos;
+    private double precoMedioMovimentoComCustos;
 
     @Expose(serialize = true, deserialize = true)
     private double custosRelativosMovimento;
 
-    @Expose(serialize = true, deserialize = true)
-    private LocalDateTime dataNegocio;
 
-
-
+    public MovimentoAtivo(String sigla,int tipoNegocio,double quantidadeMovimento,double precoMovimentoAtivo, double custosTotaisRelativosNota, double valorTotalComprasEVendas ){
+        this.sigla = sigla;
+        this.tipoNegocio = tipoNegocio; // 1 compra, 2 venda
+        this.quantidadeMovimento = quantidadeMovimento;
+        this.precoMovimentoAtivo = precoMovimentoAtivo;
+        Double valorAtivoSemCustos = quantidadeMovimento*precoMovimentoAtivo;
+        Double fracaoCustoMovimentoPeloCustoTotal = valorAtivoSemCustos /  valorTotalComprasEVendas;
+        this.custosRelativosMovimento = fracaoCustoMovimentoPeloCustoTotal * custosTotaisRelativosNota;
+        this.precoMedioMovimentoComCustos = (valorAtivoSemCustos + custosRelativosMovimento)/quantidadeMovimento;
+    }
 }

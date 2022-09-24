@@ -1,5 +1,6 @@
 package com.cyrillo.negociacao.core.entidade;
 
+import com.cyrillo.negociacao.core.dataprovider.tipo.AtivoDtoInterface;
 import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
@@ -7,6 +8,8 @@ import com.google.gson.annotations.Expose;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotaNegociacao {
     @Expose(serialize = true, deserialize = true)
@@ -36,6 +39,8 @@ public class NotaNegociacao {
     private Double valorIss;
     @Expose(serialize = true, deserialize = true)
     private Double valorLiquidoConta;
+    @Expose(serialize = true, deserialize = true)
+    private List<MovimentoAtivo> listaMovimentoAtivo = new ArrayList<>();
 
 
     public NotaNegociacao(UtilitarioInterface utilitario, String identificadorNegocio, String corretora, String identificacaoClienteNegocio, LocalDateTime dataNegocio, LocalDateTime dataLiquidacao) {
@@ -104,4 +109,8 @@ public class NotaNegociacao {
     }
 
 
+    public void adicionaMovimentoAtivo(String sigla,int tipoNegocio,double quantidadeMovimento,double precoMovimentoAtivo, double custosTotaisRelativosNota, double valorTotalComprasEVendas ){
+        MovimentoAtivo movimentoAtivo = new MovimentoAtivo(sigla,tipoNegocio,quantidadeMovimento,precoMovimentoAtivo, custosTotaisRelativosNota, valorTotalComprasEVendas);
+        this.listaMovimentoAtivo.add(movimentoAtivo);
+    }
 }

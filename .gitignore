@@ -30,4 +30,6 @@ build
 build/*
 .idea/*
 .idea/gradle.xml
+materiais
+materiais/*
 

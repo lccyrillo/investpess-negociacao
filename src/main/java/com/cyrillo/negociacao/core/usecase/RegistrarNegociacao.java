@@ -34,9 +34,9 @@ public class RegistrarNegociacao {
             validarNotaNegociacaoJaExisteRepositorio(data, notaNegociacao);
             // 1.3 - Atualizo os Dados Financeido e Verifico se o valor líquido em conta bate com outros valores informados
             atualizar_e_ValidarValoresFinanceirosNotaNegociacao(data, notaNegociacao,negociacaoDtoInterface);
-            // 1.4 - Atualizo os movmientos financeiros na nota de negociação e valido se são do tipo ação
+            // 1.4 - Atualizo e Incluir os movmientos financeiros na nota de negociação e valido se são do tipo ação
             atualizarMovimentacoesNotaNegociacao(data, notaNegociacao,negociacaoDtoInterface);
-
+            log.logInfo(flowId, sessionId,notaNegociacao.toJson());
 
 
             // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
@@ -151,10 +151,12 @@ public class RegistrarNegociacao {
         LogInterface log = data.getLoggingInterface();
         String sessionId = String.valueOf(data.getSessionId());
         String flowId = data.getFlowId();
+        log.logInfo(flowId,sessionId,"Iniciando Atualizar Movimentacoes NotaNegociacao");
         // Passo por cada movimento financeiro recebido no request e verifico se existe no repositório e é do tipo ação, se não for, erro
         // senao, sigo em frente
 
         AtivoNegociadoDtoInterface ativoNegociadoDtoInterface;
+
         List<AtivoNegociadoDtoInterface> listaAtivoNegociado = negociacaoDtoInterface.listarTodosAtivos();
         AtivoRepositorioInterface ativoRepositorioInterface = data.getAtivoRepositorio();
         for (int i = 0; i < listaAtivoNegociado.size(); i++) {
@@ -167,6 +169,14 @@ public class RegistrarNegociacao {
                     log.logInfo(flowId,sessionId,"Foi informado um ativo que não é do tipo Ação: "+ siglaAtivo);
                     throw new AtivoNaoEAcaoUseCaseExcecao("Foi informado um ativo que não é do tipo Ação: "+ siglaAtivo);
                 } else {
+                    int tipoNegocio = ativoNegociadoDtoInterface.getTipoNegocio();
+                    Double quantidadeMovimento = ativoNegociadoDtoInterface.getQuantidadeNegociada();
+                    Double precoMovimentoAtivo = ativoNegociadoDtoInterface.getPrecoNegociado();
+
+                    ValoresFinanceirosNegocioDtoInterface valoresFinanceirosNegocioDto = negociacaoDtoInterface.getValoresFinanceirosNegocioDtoInterface();
+                    Double valorTotalComprasEVendas = valoresFinanceirosNegocioDto.getValorTotalComprasEVendasAVista();
+                    Double custosTotaisNota = valoresFinanceirosNegocioDto.getCustoTotalNota();
+                    notaNegociacao.adicionaMovimentoAtivo(siglaAtivo,tipoNegocio,quantidadeMovimento,precoMovimentoAtivo,custosTotaisNota,valorTotalComprasEVendas);
                     //insiro a ação na nota de negociação
                 }
             } else{

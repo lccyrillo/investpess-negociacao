@@ -49,6 +49,16 @@ public class ValoresFinanceirosNegocioDto implements ValoresFinanceirosNegocioDt
     }
 
     @Override
+    public Double getValorTotalComprasEVendasAVista() {
+        return valorComprasAVista +valorVendasAVista ;
+    }
+
+    @Override
+    public Double getCustoTotalNota() {
+        return valorTaxaLiquidacao +valorEmolumentos+valorCorretagem+valorIss ;
+    }
+
+    @Override
     public Double getValorTaxaLiquidacao() {
         return valorTaxaLiquidacao;
     }
