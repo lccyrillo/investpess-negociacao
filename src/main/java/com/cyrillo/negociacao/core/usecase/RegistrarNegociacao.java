@@ -27,18 +27,21 @@ public class RegistrarNegociacao {
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
 
         try {
-            // 0. Cria Objeto NotaNegociacao
+            // 1.1 Cria Objeto NotaNegociacao
             NotaNegociacao notaNegociacao = criarObjetoNotaNegociacao(data, flowId, negociacaoDtoInterface);
-            log.logInfo(flowId, sessionId,notaNegociacao.toString());
             log.logInfo(flowId, sessionId,notaNegociacao.toJson());
+            // 1.2 Verifico se a nota de Negociação já existe no repositório
+            validarNotaNegociacaoJaExisteRepositorio(data, flowId, notaNegociacao);
+
+
+            // 1.2 Atualiza o objeto Nota de Negociacao com os valores de Negociacao
+
+
             // 1. Validar dados da negociação
             // 1.1 - Verifica se o valor líquido em conta bate com outros valores informados
             validarValoresFinanceirosComparadosComValorLiquidoConta(data, flowId, negociacaoDtoInterface);
             // 1.2 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
             validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, flowId, negociacaoDtoInterface);
-            // 1.3 nota de negociação ainda não existe na base (chave: corretora, numero_nota e usuario)
-            // Preciso chamar repositorio de notas de corretagem para verificar se a note já existe
-            validarNotaNegociacaoJaExisteRepositorio(data, flowId, negociacaoDtoInterface);
             // 1.4 preciso validar se todos os ativos existentes na nota existem, e são do tipo ação.
         } catch (ComunicacaoRepoDataProvExcecao e) {
             ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com Repositório: AtivoRepositorio");
@@ -107,19 +110,19 @@ public class RegistrarNegociacao {
         return new NotaNegociacao(data.getUtilitario(),identificador,corretora,cliente,dataNegocio, dataLiquidacao);
     }
 
-    private void validarNotaNegociacaoJaExisteRepositorio(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
+    private void validarNotaNegociacaoJaExisteRepositorio(DataProviderInterface data, String flowId, NotaNegociacao notaNegociacao) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
         LogInterface log = data.getLoggingInterface();
         String sessionId = String.valueOf(data.getSessionId());
         NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
-        String identificador = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getIdentificadorNegocio();
-        String cliente = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getIdentificacaoClienteNegocio();
-        String corretora = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getCorretora();
+        String identificador = notaNegociacao.getIdentificadorNegocio();
+        String cliente = notaNegociacao.getIdentificacaoClienteNegocio();
+        String corretora = notaNegociacao.getCorretora();
         if (notaNegociacaoRepositorio.consultarNotaNegociacao(data, identificador,corretora,cliente ) == false) {
             // segue o fluxo
             log.logInfo(flowId, sessionId, "Nota negociação não existe. Vamos cadastrar.");
         }
         else {
-            log.logInfo(flowId, sessionId, "Nota negociação já existe no repositório: " + negociacaoDtoInterface.toString());
+            log.logInfo(flowId, sessionId, "Nota negociação já existe no repositório: " + notaNegociacao.toString());
             throw new NotaNegociacaoExistenteUseCaseExcecao("Nota negociação já existe no repositório.");
         }
     }

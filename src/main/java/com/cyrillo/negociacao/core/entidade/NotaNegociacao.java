@@ -40,5 +40,25 @@ public class NotaNegociacao {
         return utilitario.converterObjetoParaJson(this);
     }
 
+    public String getIdentificadorNegocio() {
+        return identificadorNegocio;
+    }
+
+    public String getCorretora() {
+        return corretora;
+    }
+
+    public String getIdentificacaoClienteNegocio() {
+        return identificacaoClienteNegocio;
+    }
+
+    public LocalDate getDataNegocio() {
+        return dataNegocio;
+    }
+
+    public LocalDate getDataLiquidacao() {
+        return dataLiquidacao;
+    }
+
 
 }
