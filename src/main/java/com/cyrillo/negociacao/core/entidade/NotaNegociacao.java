@@ -91,6 +91,7 @@ public class NotaNegociacao {
         this.valorCorretagem=valorCorretagem;
         this.valorIss=valorIss;
         this.valorLiquidoConta=valorLiquidoConta;
+
     }
 
     public void validarValoresFinanceirosComparadosComValorLiquidoConta() throws ValoresFinanceirosNaoConferemEntidadeExcecao {

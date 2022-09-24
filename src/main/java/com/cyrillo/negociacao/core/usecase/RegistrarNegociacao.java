@@ -143,6 +143,7 @@ public class RegistrarNegociacao {
             log.logInfo(flowId, sessionId,"Valor de conferência de líquido para conta não confere com valor informado!. Nota Negociação: " + notaNegociacao.toJson());
             e.printStackTrace();
             throw falha;
+
         }
     }
 

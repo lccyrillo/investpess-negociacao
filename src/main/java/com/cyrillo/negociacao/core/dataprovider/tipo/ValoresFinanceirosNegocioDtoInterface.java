@@ -13,4 +13,5 @@ public interface ValoresFinanceirosNegocioDtoInterface {
     public Double getValorIrrf();
     public Double getValorLiquidoConta();
     public String toString();
+
 }

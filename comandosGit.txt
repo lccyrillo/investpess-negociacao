@@ -1,6 +1,7 @@
 0) Comandos intellij
 Ctrl + Alt + L - transformar json
 
+
 0) setup de trabalho
 -> entra no diretorio pai
 >> git clone https://github.com/lccyrillo/investpess-negociacao.git

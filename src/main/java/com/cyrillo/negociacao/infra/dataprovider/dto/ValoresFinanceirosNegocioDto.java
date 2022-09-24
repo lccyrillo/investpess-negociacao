@@ -58,6 +58,7 @@ public class ValoresFinanceirosNegocioDto implements ValoresFinanceirosNegocioDt
         return valorTaxaLiquidacao +valorEmolumentos+valorCorretagem+valorIss ;
     }
 
+
     @Override
     public Double getValorTaxaLiquidacao() {
         return valorTaxaLiquidacao;
