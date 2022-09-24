@@ -1,8 +1,7 @@
-package com.cyrillo.negociacao.core.dataprovider.tipos;
+package com.cyrillo.negociacao.core.dataprovider.tipo;
 
 
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoLogDataProvExcecao;
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
 
 public interface LogInterface {
     public void logError(String flowid, String sessionId, String mensagem);

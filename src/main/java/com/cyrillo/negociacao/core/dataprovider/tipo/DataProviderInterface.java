@@ -1,6 +1,6 @@
-package com.cyrillo.negociacao.core.dataprovider.tipos;
+package com.cyrillo.negociacao.core.dataprovider.tipo;
 
-import java.time.LocalDateTime;
+import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 
 // Acerto para apontar para conexao interface
 public interface DataProviderInterface {

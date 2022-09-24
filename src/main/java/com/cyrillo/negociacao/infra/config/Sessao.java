@@ -1,9 +1,8 @@
 package com.cyrillo.negociacao.infra.config;
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.*;
-import com.google.gson.Gson;
+import com.cyrillo.negociacao.core.dataprovider.tipo.*;
+import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Sessao implements DataProviderInterface {

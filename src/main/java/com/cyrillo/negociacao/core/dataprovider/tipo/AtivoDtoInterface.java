@@ -1,4 +1,4 @@
-package com.cyrillo.negociacao.core.dataprovider.tipos;
+package com.cyrillo.negociacao.core.dataprovider.tipo;
 
 public interface AtivoDtoInterface {
     public String getSigla();

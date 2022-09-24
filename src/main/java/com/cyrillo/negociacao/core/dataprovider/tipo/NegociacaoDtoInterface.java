@@ -1,6 +1,4 @@
-package com.cyrillo.negociacao.core.dataprovider.tipos;
-
-import com.cyrillo.negociacao.infra.dataprovider.dto.ValoresFinanceirosNegocioDto;
+package com.cyrillo.negociacao.core.dataprovider.tipo;
 
 import java.util.List;
 

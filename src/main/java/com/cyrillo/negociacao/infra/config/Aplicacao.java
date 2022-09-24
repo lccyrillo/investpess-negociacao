@@ -1,6 +1,7 @@
 package com.cyrillo.negociacao.infra.config;
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.*;
+import com.cyrillo.negociacao.core.dataprovider.tipo.*;
+import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
 import com.cyrillo.negociacao.infra.config.excecao.PropriedadeInvalidaConfigExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.AtivoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.LogInterfaceImplConsole;

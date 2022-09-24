@@ -1,7 +1,7 @@
 package com.cyrillo.negociacao.infra.dataprovider.dto;
 
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoNegociadoDtoInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.AtivoNegociadoDtoInterface;
 import com.google.gson.annotations.Expose;
 
 public class AtivoNegociadoDto implements AtivoNegociadoDtoInterface {

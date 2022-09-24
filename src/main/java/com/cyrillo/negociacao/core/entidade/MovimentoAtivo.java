@@ -16,7 +16,13 @@ public class MovimentoAtivo {
     private double quantidadeMovimento;
 
     @Expose(serialize = true, deserialize = true)
-    private double precoMedioMovimento;
+    private double precoMedioMovimentoComCustos;
+
+    @Expose(serialize = true, deserialize = true)
+    private double precoMedioMovimentoSemCustos;
+
+    @Expose(serialize = true, deserialize = true)
+    private double custosRelativosMovimento;
 
     @Expose(serialize = true, deserialize = true)
     private LocalDateTime dataNegocio;

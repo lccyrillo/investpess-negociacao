@@ -1,8 +1,8 @@
 package com.cyrillo.negociacao.infra.dataprovider.dto;
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.UtilitarioInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.ValoresFinanceirosNegocioDtoInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
+import com.cyrillo.negociacao.core.tipobasico.UtilitarioInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.ValoresFinanceirosNegocioDtoInterface;
 import com.google.gson.annotations.Expose;
 
 public class ValoresFinanceirosNegocioDto implements ValoresFinanceirosNegocioDtoInterface {

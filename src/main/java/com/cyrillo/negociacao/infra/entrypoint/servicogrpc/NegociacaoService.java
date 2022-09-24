@@ -4,9 +4,8 @@ import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCas
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
 import com.cyrillo.negociacao.infra.dataprovider.dto.IdentificacaoNegocioDto;
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.IdentificacaoNegocioDtoInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.LogInterface;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ParametrosInvalidosUseCaseExcecao;
 import com.cyrillo.negociacao.infra.dataprovider.dto.NegociacaoDto;
@@ -15,7 +14,6 @@ import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.*;
 import com.cyrillo.negociacao.infra.facade.FacadeNegociacao;
 import io.grpc.stub.StreamObserver;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class NegociacaoService extends NegociacaoServiceGrpc.NegociacaoServiceImplBase {

@@ -1,7 +1,7 @@
 package com.cyrillo.negociacao.infra.facade;
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.LogInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.LogInterface;
 import com.cyrillo.negociacao.core.usecase.RegistrarNegociacao;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;

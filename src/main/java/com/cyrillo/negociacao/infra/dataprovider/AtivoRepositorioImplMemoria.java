@@ -1,9 +1,9 @@
 package com.cyrillo.negociacao.infra.dataprovider;
 
 
-import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoDtoInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.AtivoRepositorioInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipos.DataProviderInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.AtivoDtoInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.AtivoRepositorioInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 
 import java.util.ArrayList;

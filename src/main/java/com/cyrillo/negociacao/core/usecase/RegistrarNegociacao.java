@@ -2,13 +2,13 @@ package com.cyrillo.negociacao.core.usecase;
 
 
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
-import com.cyrillo.negociacao.core.dataprovider.tipos.*;
+import com.cyrillo.negociacao.core.dataprovider.tipo.*;
+import com.cyrillo.negociacao.core.entidade.NotaNegociacao;
 import com.cyrillo.negociacao.core.usecase.excecao.ComunicacaoRepoUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.NotaNegociacaoExistenteUseCaseExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.ValoresFinanceirosNaoConferemUseCaseExcecao;
-import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoNegociadoDto;
-import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.negociacaoproto.AtivoNegociado;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RegistrarNegociacao {
@@ -27,6 +27,10 @@ public class RegistrarNegociacao {
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
 
         try {
+            // 0. Cria Objeto NotaNegociacao
+            NotaNegociacao notaNegociacao = criarObjetoNotaNegociacao(data, flowId, negociacaoDtoInterface);
+            log.logInfo(flowId, sessionId,notaNegociacao.toString());
+            log.logInfo(flowId, sessionId,notaNegociacao.toJson());
             // 1. Validar dados da negociação
             // 1.1 - Verifica se o valor líquido em conta bate com outros valores informados
             validarValoresFinanceirosComparadosComValorLiquidoConta(data, flowId, negociacaoDtoInterface);
@@ -89,6 +93,18 @@ public class RegistrarNegociacao {
             e.printStackTrace();
             throw falha;
         }*/
+    }
+
+    private NotaNegociacao criarObjetoNotaNegociacao(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
+        LogInterface log = data.getLoggingInterface();
+        String sessionId = String.valueOf(data.getSessionId());
+        NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
+        String identificador = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getIdentificadorNegocio();
+        String cliente = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getIdentificacaoClienteNegocio();
+        String corretora = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getCorretora();
+        LocalDateTime dataNegocio = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getDataNegocio();
+        LocalDateTime dataLiquidacao = negociacaoDtoInterface.getIdentificacaoNegocioDtoInterface().getDataLiquidacao();
+        return new NotaNegociacao(data.getUtilitario(),identificador,corretora,cliente,dataNegocio, dataLiquidacao);
     }
 
     private void validarNotaNegociacaoJaExisteRepositorio(DataProviderInterface data, String flowId, NegociacaoDtoInterface negociacaoDtoInterface) throws ComunicacaoRepoDataProvExcecao,NotaNegociacaoExistenteUseCaseExcecao {
