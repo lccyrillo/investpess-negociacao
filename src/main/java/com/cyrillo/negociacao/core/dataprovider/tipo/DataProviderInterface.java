@@ -13,4 +13,5 @@ public interface DataProviderInterface {
     public String getFlowId();
     public UtilitarioInterface getUtilitario();
     public NotaNegociacaoRepositorioInterface getNotaNegocicacaoRepositorio();
+    public EventoRepositorioInterface getEventoRepositorioInterface();
 }

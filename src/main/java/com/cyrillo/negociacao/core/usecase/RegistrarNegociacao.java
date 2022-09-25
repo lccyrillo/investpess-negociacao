@@ -3,6 +3,7 @@ package com.cyrillo.negociacao.core.usecase;
 
 import com.cyrillo.negociacao.core.dataprovider.excecao.ComunicacaoRepoDataProvExcecao;
 import com.cyrillo.negociacao.core.dataprovider.tipo.*;
+import com.cyrillo.negociacao.core.entidade.EventoNotaNegociacaoInserida;
 import com.cyrillo.negociacao.core.entidade.NotaNegociacao;
 import com.cyrillo.negociacao.core.entidade.excecao.ValoresFinanceirosNaoConferemEntidadeExcecao;
 import com.cyrillo.negociacao.core.usecase.excecao.*;
@@ -26,6 +27,7 @@ public class RegistrarNegociacao {
         log.logInfo(flowId, sessionId, "Iniciando Use Case RegistrarNegociacao()");
         log.logInfo(flowId, sessionId, "Dados requisição: " + negociacaoDtoInterface.toString());
         AtivoRepositorioInterface repoAtivo = data.getAtivoRepositorio();
+        NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
 
         try {
             // 1.1 Cria Objeto NotaNegociacao
@@ -41,18 +43,20 @@ public class RegistrarNegociacao {
             // 1.5 - Verificar se o valor somado dos ativos informados corresponde com o valor informado da nota de negociação
             // Refatorar ---> Pensar em jogar esse cálculo para dentro da nota de negociacao objeto / não DTO
             validarValoresFinanceirosAtivosComparadosComValorVendasECompras(data, negociacaoDtoInterface);
-
+            // 1.6 Persistir Nota de Negociação
+            int codigoEntidade = notaNegociacaoRepositorio.armazenarNotaNegociacao(data,notaNegociacao);
             // Passos que faltam
             // 24/09/2022
-            // 1.6 Persistir Nota de Negociação
-            NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio = data.getNotaNegocicacaoRepositorio();
-            notaNegociacaoRepositorio.armazenarNotaNegociacao(data,notaNegociacao);
             // 1.7 Notificar serviço para calcular posiçao e resultado na venda
+            EventoInterface evento = new EventoNotaNegociacaoInserida(1,codigoEntidade,"Nota Negociação Inserida",notaNegociacao.toJson());
+            EventoRepositorioInterface eventoRepositorio = data.getEventoRepositorioInterface();
+            eventoRepositorio.notificarEvento(data,evento);
+
 
         } catch (ComunicacaoRepoDataProvExcecao e) {
-            ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com Repositório: AtivoRepositorio");
+            ComunicacaoRepoUseCaseExcecao falha = new ComunicacaoRepoUseCaseExcecao("Falha na comunicação do Use Case com repositório de dados.");
             falha.addSuppressed(e);
-            log.logError(flowId, sessionId,"Erro na comunicação com repositório de notas de negociação");
+            log.logError(flowId, sessionId,"Erro na comunicação com repositório de dados.");
             e.printStackTrace();
             throw falha;
         }

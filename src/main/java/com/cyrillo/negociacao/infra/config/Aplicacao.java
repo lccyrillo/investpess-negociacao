@@ -7,6 +7,7 @@ import com.cyrillo.negociacao.infra.config.excecao.PropriedadeInvalidaConfigExce
 import com.cyrillo.negociacao.infra.dataprovider.AtivoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.LogInterfaceImplConsole;
 import com.cyrillo.negociacao.infra.dataprovider.NotaNegociacaoRepositorioImplMemoria;
+import com.cyrillo.negociacao.infra.dataprovider.EventoRepositorioImplMemoria;
 import com.cyrillo.negociacao.infra.dataprovider.dto.AtivoDto;
 import com.cyrillo.negociacao.infra.entrypoint.servicogrpc.NegociacaoServerGRPC;
 import com.cyrillo.negociacao.infra.util.Utilitario;
@@ -31,6 +32,7 @@ public class Aplicacao implements DataProviderInterface {
     private Utilitario utilitario;
     private NotaNegociacaoRepositorioInterface notaNegociacaoRepositorio;
     private AtivoRepositorioInterface ativoRepositorio;
+    private EventoRepositorioInterface eventoEventoReposito;
 
 
 
@@ -167,6 +169,7 @@ public class Aplicacao implements DataProviderInterface {
        // else {
         this.ativoRepositorio = new AtivoRepositorioImplMemoria();
         this.notaNegociacaoRepositorio = new NotaNegociacaoRepositorioImplMemoria();
+        this.eventoEventoReposito = new EventoRepositorioImplMemoria();
 
         // }
     }
@@ -185,7 +188,12 @@ public class Aplicacao implements DataProviderInterface {
         return utilitario;
     }
 
-    public NotaNegociacaoRepositorioInterface getNotaNegocicacaoRepositorio() {return notaNegociacaoRepositorio;}
+    @Override
+    public NotaNegociacaoRepositorioInterface getNotaNegocicacaoRepositorio() {
+        return this.notaNegociacaoRepositorio;
+    }
+
+    public EventoRepositorioInterface getEventoRepositorioInterface() {return eventoEventoReposito; }
 
 
 

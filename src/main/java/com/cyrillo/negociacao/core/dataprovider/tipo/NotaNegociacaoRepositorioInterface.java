@@ -8,5 +8,5 @@ import java.time.LocalDateTime;
 
 public interface NotaNegociacaoRepositorioInterface {
     boolean consultarNotaNegociacao(DataProviderInterface data, String identificadorNegocio, String corretoraNegocio, String identificacaoClienteNegocio, LocalDate dataNegocio) throws ComunicacaoRepoDataProvExcecao;
-    void armazenarNotaNegociacao(DataProviderInterface data, NotaNegociacaoInterface notaNegociacaoInterface) throws ComunicacaoRepoDataProvExcecao;
+    int armazenarNotaNegociacao(DataProviderInterface data, NotaNegociacaoInterface notaNegociacaoInterface) throws ComunicacaoRepoDataProvExcecao;
 }

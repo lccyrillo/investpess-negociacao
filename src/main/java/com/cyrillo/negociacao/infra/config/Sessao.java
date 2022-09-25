@@ -61,4 +61,9 @@ public class Sessao implements DataProviderInterface {
         return Aplicacao.getInstance().getNotaNegocicacaoRepositorio();
     }
 
+    @Override
+    public EventoRepositorioInterface getEventoRepositorioInterface() {
+        return Aplicacao.getInstance().getEventoRepositorioInterface();
+    }
+
 }

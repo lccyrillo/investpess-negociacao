@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class NotaNegociacaoRepositorioImplMemoria implements NotaNegociacaoRepositorioInterface {
 
@@ -28,8 +29,10 @@ public class NotaNegociacaoRepositorioImplMemoria implements NotaNegociacaoRepos
         log.logInfo(flowId, sessionId,corretoraNegocio);
 
         if (this.listaNegociacao.stream()
-            .filter(a -> a.getIdentificacaoNegocioDtoInterface().getIdentificadorNegocio().equals(identificadorNegocio))
-            .findFirst().isPresent()) {
+            .filter( ((Predicate<NegociacaoDtoInterface>) a -> a.getIdentificacaoNegocioDtoInterface().getIdentificadorNegocio().equals(identificadorNegocio))
+                    .and(a -> a.getIdentificacaoNegocioDtoInterface().getCorretora().equals(corretoraNegocio))
+                    .and(a -> a.getIdentificacaoNegocioDtoInterface().getIdentificacaoClienteNegocio().equals(identificacaoClienteNegocio)) )
+                    .findFirst().isPresent()) {
             return true;
         }
         else {
@@ -37,10 +40,13 @@ public class NotaNegociacaoRepositorioImplMemoria implements NotaNegociacaoRepos
         }
     }
 
+
+
     @Override
-    public void armazenarNotaNegociacao(DataProviderInterface data, NotaNegociacaoInterface notaNegociacaoInterface) throws ComunicacaoRepoDataProvExcecao {
+    public int armazenarNotaNegociacao(DataProviderInterface data, NotaNegociacaoInterface notaNegociacaoInterface) throws ComunicacaoRepoDataProvExcecao {
         NegociacaoDto negociacaoDto = geraObjetoDtoComObjetoNegociacaoInterface(data,notaNegociacaoInterface);
         this.listaNegociacao.add(negociacaoDto);
+        return listaNegociacao.indexOf(negociacaoDto)+100;
 
     }
 

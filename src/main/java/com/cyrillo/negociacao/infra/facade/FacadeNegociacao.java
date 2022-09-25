@@ -16,6 +16,6 @@ public class FacadeNegociacao {
         String sessionId = data.getSessionId();
         log.logInfo(flowId,sessionId,"Iniciando Facade Registrar Negociação");
         //log.logInfo(flowId,sessionId,negociacaoDto.toString());
-        new RegistrarNegociacao().executar(data,"flowid",negociacaoDto);
+        new RegistrarNegociacao().executar(data,flowId,negociacaoDto);
     }
 }
