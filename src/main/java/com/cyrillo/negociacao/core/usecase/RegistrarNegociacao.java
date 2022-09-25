@@ -50,7 +50,7 @@ public class RegistrarNegociacao {
             // 1.7 Notificar serviço para calcular posiçao e resultado na venda
             EventoInterface evento = new EventoNotaNegociacaoInserida(1,codigoEntidade,"Nota Negociação Inserida",notaNegociacao.toJson());
             EventoRepositorioInterface eventoRepositorio = data.getEventoRepositorioInterface();
-            eventoRepositorio.notificarEvento(data,evento);
+            eventoRepositorio.notificarEvento(data,evento,notaNegociacao);
 
 
         } catch (ComunicacaoRepoDataProvExcecao e) {

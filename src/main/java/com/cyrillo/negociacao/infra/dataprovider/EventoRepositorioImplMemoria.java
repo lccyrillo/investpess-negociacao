@@ -1,16 +1,14 @@
 package com.cyrillo.negociacao.infra.dataprovider;
 
-import com.cyrillo.negociacao.core.dataprovider.tipo.DataProviderInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipo.EventoInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipo.LogInterface;
-import com.cyrillo.negociacao.core.dataprovider.tipo.EventoRepositorioInterface;
+import com.cyrillo.negociacao.core.dataprovider.tipo.*;
 
 public class EventoRepositorioImplMemoria implements EventoRepositorioInterface {
     @Override
-    public void notificarEvento(DataProviderInterface data, EventoInterface eventoInterface) {
+    public void notificarEvento(DataProviderInterface data, EventoInterface eventoInterface, NotaNegociacaoInterface notaNegociacaoInterface) {
         String sessionId = String.valueOf(data.getSessionId());
         String flowId = data.getFlowId();
         LogInterface log = data.getLoggingInterface();
         log.logInfo(flowId, sessionId,eventoInterface.getMensagemEvento());
     }
+
 }
